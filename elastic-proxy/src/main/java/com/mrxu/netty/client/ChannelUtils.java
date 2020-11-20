@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChannelUtils {
     public static final AttributeKey<ConcurrentHashMap<String, SessionContext>> PROXY_NETTY_CLIENT_ATTRIBUTE = AttributeKey.valueOf("proxy_netty_client_attribute");
 
-    public static SessionContext getClientChannel(Channel channel) {
+    public static SessionContext getSessionContext(Channel channel) {
         return channel.attr(PROXY_NETTY_CLIENT_ATTRIBUTE).get().get(channel.id().asLongText());
     }
 

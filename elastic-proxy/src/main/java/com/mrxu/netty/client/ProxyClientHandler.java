@@ -14,7 +14,7 @@ public class ProxyClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object response) throws Exception {
         try {
-            SessionContext sessionContext = ChannelUtils.getClientChannel(ctx.channel());
+            SessionContext sessionContext = ChannelUtils.getSessionContext(ctx.channel());
             //0拷贝写回数据
             sessionContext.getClientChannel().writeAndFlush(response);
             sessionContext.getFuture().cancel(false);
