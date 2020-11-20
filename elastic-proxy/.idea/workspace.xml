@@ -13,14 +13,16 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10890895-26e5-41b0-9f57-090946120379" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="10890895-26e5-41b0-9f57-090946120379" name="Default Changelist" comment="修改代码">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Pull.Settings">
+    <option name="BRANCH" value="master" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -39,24 +41,19 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
   <component name="RunManager">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="ElasticProxyApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <module name="elastic-proxy" />
       <extension name="coverage">
@@ -85,8 +82,16 @@
       <option name="presentableId" value="Default" />
       <updated>1605878951492</updated>
       <workItem from="1605878952529" duration="49000" />
-      <workItem from="1605879459952" duration="74000" />
+      <workItem from="1605879459952" duration="1269000" />
     </task>
+    <task id="LOCAL-00001" summary="修改代码">
+      <created>1605879671209</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1605879671209</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -108,15 +113,61 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/../.." />
     </ignored-roots>
+    <MESSAGE value="修改代码" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改代码" />
   </component>
   <component name="WindowStateProjectService">
     <state x="443" y="117" width="1089" height="714" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605879510622">
       <screen x="0" y="0" width="2048" height="1152" />
     </state>
     <state x="443" y="117" width="1089" height="714" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2048.1152@0.0.2048.1152" timestamp="1605879510622" />
+    <state width="1234" height="332" key="GridCell.Tab.0.bottom" timestamp="1605880732082">
+      <screen x="0" y="0" width="2048" height="1152" />
+    </state>
+    <state width="1234" height="332" key="GridCell.Tab.0.bottom/0.0.2048.1152@0.0.2048.1152" timestamp="1605880732082" />
+    <state width="1234" height="332" key="GridCell.Tab.0.center" timestamp="1605880732082">
+      <screen x="0" y="0" width="2048" height="1152" />
+    </state>
+    <state width="1234" height="332" key="GridCell.Tab.0.center/0.0.2048.1152@0.0.2048.1152" timestamp="1605880732082" />
+    <state width="1234" height="332" key="GridCell.Tab.0.left" timestamp="1605880732082">
+      <screen x="0" y="0" width="2048" height="1152" />
+    </state>
+    <state width="1234" height="332" key="GridCell.Tab.0.left/0.0.2048.1152@0.0.2048.1152" timestamp="1605880732082" />
+    <state width="1234" height="332" key="GridCell.Tab.0.right" timestamp="1605880732082">
+      <screen x="0" y="0" width="2048" height="1152" />
+    </state>
+    <state width="1234" height="332" key="GridCell.Tab.0.right/0.0.2048.1152@0.0.2048.1152" timestamp="1605880732082" />
+    <state width="1234" height="332" key="GridCell.Tab.1.bottom" timestamp="1605880732082">
+      <screen x="0" y="0" width="2048" height="1152" />
+    </state>
+    <state width="1234" height="332" key="GridCell.Tab.1.bottom/0.0.2048.1152@0.0.2048.1152" timestamp="1605880732082" />
+    <state width="1234" height="332" key="GridCell.Tab.1.center" timestamp="1605880732082">
+      <screen x="0" y="0" width="2048" height="1152" />
+    </state>
+    <state width="1234" height="332" key="GridCell.Tab.1.center/0.0.2048.1152@0.0.2048.1152" timestamp="1605880732082" />
+    <state width="1234" height="332" key="GridCell.Tab.1.left" timestamp="1605880732082">
+      <screen x="0" y="0" width="2048" height="1152" />
+    </state>
+    <state width="1234" height="332" key="GridCell.Tab.1.left/0.0.2048.1152@0.0.2048.1152" timestamp="1605880732082" />
+    <state width="1234" height="332" key="GridCell.Tab.1.right" timestamp="1605880732082">
+      <screen x="0" y="0" width="2048" height="1152" />
+    </state>
+    <state width="1234" height="332" key="GridCell.Tab.1.right/0.0.2048.1152@0.0.2048.1152" timestamp="1605880732082" />
+    <state x="569" y="205" key="IDE.errors.dialog" timestamp="1605879552385">
+      <screen x="0" y="0" width="2048" height="1152" />
+    </state>
+    <state x="569" y="205" key="IDE.errors.dialog/0.0.2048.1152@0.0.2048.1152" timestamp="1605879552385" />
     <state x="497" y="107" key="SettingsEditor" timestamp="1605879533015">
       <screen x="0" y="0" width="2048" height="1152" />
     </state>
     <state x="497" y="107" key="SettingsEditor/0.0.2048.1152@0.0.2048.1152" timestamp="1605879533015" />
+    <state x="581" y="195" key="Vcs.Push.Dialog.v2" timestamp="1605880329905">
+      <screen x="0" y="0" width="2048" height="1152" />
+    </state>
+    <state x="581" y="195" key="Vcs.Push.Dialog.v2/0.0.2048.1152@0.0.2048.1152" timestamp="1605880329905" />
+    <state x="806" y="376" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605879684539">
+      <screen x="0" y="0" width="2048" height="1152" />
+    </state>
+    <state x="806" y="376" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2048.1152@0.0.2048.1152" timestamp="1605879684539" />
   </component>
 </project>
