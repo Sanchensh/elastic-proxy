@@ -66,6 +66,6 @@ public class ByteBufManager {
             }
         }
         //安全释放请求buffer
-        deepSafeRelease(sessionContext.getRequest().getHttpRequest().content());
+        deepSafeRelease(sessionContext.getFullHttpRequest().content());
     }
 }

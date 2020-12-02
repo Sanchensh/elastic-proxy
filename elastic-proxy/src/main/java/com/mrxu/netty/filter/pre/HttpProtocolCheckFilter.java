@@ -4,11 +4,11 @@ import com.mrxu.exception.CustomException;
 import com.mrxu.netty.boot.ProxyRunner;
 import com.mrxu.netty.filter.AbstractFilter;
 import com.mrxu.netty.filter.AbstractFilterContext;
-import com.mrxu.netty.pojo.ProxyHttpRequest;
 import com.mrxu.netty.pojo.SessionContext;
 import io.netty.handler.codec.DecoderResult;
 import io.netty.handler.codec.PrematureChannelClosureException;
 import io.netty.handler.codec.TooLongFrameException;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.ErrorDataDecoderException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +26,7 @@ public class HttpProtocolCheckFilter extends AbstractFilter {
 
     @Override
     public void run(final AbstractFilterContext filterContext, final SessionContext sessionContext) throws CustomException {
-        ProxyHttpRequest request = sessionContext.getRequest();
+        FullHttpRequest request = sessionContext.getFullHttpRequest();
         DecoderResult decoderResult = request.getDecoderResult();
         if (decoderResult != null) {
             if (decoderResult.isFailure()) {

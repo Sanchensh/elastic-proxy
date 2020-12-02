@@ -6,7 +6,6 @@ import com.mrxu.model.CommonDTO;
 import com.mrxu.netty.boot.ProxyRunner;
 import com.mrxu.netty.filter.AbstractFilter;
 import com.mrxu.netty.filter.AbstractFilterContext;
-import com.mrxu.netty.pojo.ProxyHttpRequest;
 import com.mrxu.netty.pojo.SessionContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import lombok.Data;
@@ -26,8 +25,7 @@ public class ESRequestUriFilter extends AbstractFilter {
 
     @Override
     public void run(AbstractFilterContext filterContext, SessionContext sessionContext) throws CustomException {
-        ProxyHttpRequest req = sessionContext.getRequest();
-        FullHttpRequest httpRequest = req.getHttpRequest();
+        FullHttpRequest httpRequest = sessionContext.getFullHttpRequest();
         CommonDTO commonDTO = sessionContext.getCommonDTO();
         String index = commonDTO.getIndex();
         String uri ;

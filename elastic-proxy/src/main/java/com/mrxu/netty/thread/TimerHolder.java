@@ -5,12 +5,13 @@ import io.netty.util.Timeout;
 import io.netty.util.Timer;
 import io.netty.util.internal.PlatformDependent;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 public class TimerHolder {
 
-    private final static long defaultTickDuration = 10;
+    private final static long defaultTickDuration = 1;
 
 	private final static ConcurrentMap<String, Timeout> scheduledFutures = PlatformDependent.newConcurrentHashMap();
 
@@ -43,6 +44,14 @@ public class TimerHolder {
 		}, delay, unit);
 
 		replaceScheduledFuture(key, timeout);
+	}
+
+	public static void cancel(String key){
+		Timeout timeout = scheduledFutures.get(key);
+		if (Objects.nonNull(timeout)){
+			timeout.cancel();
+			scheduledFutures.remove(key);
+		}
 	}
 
 

@@ -5,7 +5,6 @@ import com.mrxu.model.CommonDTO;
 import com.mrxu.netty.boot.ProxyRunner;
 import com.mrxu.netty.filter.AbstractFilter;
 import com.mrxu.netty.filter.AbstractFilterContext;
-import com.mrxu.netty.pojo.ProxyHttpRequest;
 import com.mrxu.netty.pojo.SessionContext;
 import com.mrxu.sql.exception.SqlParseException;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -28,16 +27,15 @@ public class SqlParseAndCheckFilter extends AbstractFilter {
 
     @Override
     public void run(final AbstractFilterContext filterContext, final SessionContext sessionContext) throws CustomException {
-        if (!sessionContext.getRequest().getHttpRequest().method().name().equalsIgnoreCase("POST")) {
+        FullHttpRequest fullHttpRequest = sessionContext.getFullHttpRequest();
+        if (!fullHttpRequest.method().name().equalsIgnoreCase("POST")) {
             ProxyRunner.errorProcess(sessionContext, new CustomException("method error", "request method must be POST"));
             close(sessionContext);
             return;
         }
 
         try {
-            ProxyHttpRequest request = sessionContext.getRequest();
-            FullHttpRequest httpRequest = request.getHttpRequest();
-            CommonDTO commonDTO = getCommonDTO(httpRequest);
+            CommonDTO commonDTO = getCommonDTO(fullHttpRequest);
             if (StringUtils.isNotEmpty(commonDTO.getSql())) {
                 try {
                     Tuple<String[], String> tuple = singleton.explain2Tuple(commonDTO.getSql());

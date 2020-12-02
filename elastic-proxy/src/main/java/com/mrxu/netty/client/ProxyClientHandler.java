@@ -17,9 +17,11 @@ public class ProxyClientHandler extends ChannelInboundHandlerAdapter {
             SessionContext sessionContext = ChannelUtils.getSessionContext(ctx.channel());
             //0拷贝写回数据
             sessionContext.getClientChannel().writeAndFlush(response);
-            sessionContext.getFuture().cancel(false);
+
         } catch (Throwable throwable) {
             log.error("写回数据出错，错误信息:{}", ExceptionUtils.getStackTrace(throwable));
+        } finally {
+            ChannelUtils.cancel(ctx.channel());
         }
     }
 }

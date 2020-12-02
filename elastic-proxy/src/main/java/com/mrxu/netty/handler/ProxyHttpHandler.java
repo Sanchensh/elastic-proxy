@@ -3,7 +3,6 @@ package com.mrxu.netty.handler;
 import com.mrxu.netty.boot.ProxyRunner;
 import com.mrxu.netty.filter.DefaultFilterPipeLine;
 import com.mrxu.netty.filter.error.HandleErrorFilter;
-import com.mrxu.netty.pojo.ProxyHttpRequest;
 import com.mrxu.netty.pojo.SessionContext;
 import com.mrxu.netty.util.HttpCode;
 import io.netty.buffer.Unpooled;
@@ -16,11 +15,13 @@ import io.netty.handler.codec.TooLongFrameException;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static com.mrxu.netty.util.ByteBufManager.deepSafeRelease;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -33,23 +34,23 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class ProxyHttpHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        SessionContext context = new SessionContext();
         try {
             FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
             if (is100ContinueExpected(fullHttpRequest)) {
                 ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
             }
-            ProxyHttpRequest request = new ProxyHttpRequest(fullHttpRequest);
+            String timeout = fullHttpRequest.headers().get("timeout");
+            SessionContext context;
+            if (StringUtils.isNoneBlank(timeout)){
+                context = new SessionContext(Long.parseLong(timeout), TimeUnit.MILLISECONDS);
+            } else {
+                context = new SessionContext();
+            }
             context.setClientChannel(ctx.channel());
-            context.setRequest(request);
+            context.setFullHttpRequest(fullHttpRequest);
             ProxyRunner.run(context);
         } catch (Throwable t) {
             log.error("client请求有误，错误信息：{}" , ExceptionUtils.getStackTrace(t));
-            if (Objects.nonNull(context)) {
-                context.setThrowable(t);
-                context.setHttpCode(HttpCode.HTTP_INTERNAL_SERVER_ERROR);
-                DefaultFilterPipeLine.getInstance().get(HandleErrorFilter.DEFAULT_NAME).fireSelf(context);
-            }
         } finally {
             deepSafeRelease(msg);
         }

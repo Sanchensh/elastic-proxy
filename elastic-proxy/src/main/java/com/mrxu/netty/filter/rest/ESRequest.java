@@ -22,18 +22,13 @@ public class ESRequest {
         ProxyThreadPool.submit(() -> {
             try {
                 ElasticSearchInfo elasticSearchInfo =  ElasticSearchInfo.Instance;
+                DefaultFullHttpRequest fullRequest = context.getEsRequest(elasticSearchInfo);
                 //获取channel
-                DefaultFullHttpRequest fullRequest = context.getFullRequest(elasticSearchInfo);
-                FixedChannelPool fixedChannelPool = elasticSearchInfo.getProxyChannelPool().getFixedChannelPool();
-                fixedChannelPool.acquire().addListener((FutureListener<Channel>) future -> {
-                    if (future.isSuccess()){
-                        Channel channel = future.getNow();
-                        ChannelUtils.attributeChannel(context,channel);
-                        channel.writeAndFlush(fullRequest).addListener(future1 -> fixedChannelPool.release(channel));
-                    } else {
-                        log.error("从连接池中获取channel失败");
-                    }
-                });
+                Channel channel = elasticSearchInfo.acquire();
+                context.setElasticSearchInfo(elasticSearchInfo);
+                context.setEsChannel(channel);
+                ChannelUtils.attributeChannel(channel,context);
+                channel.writeAndFlush(fullRequest);
             } catch (Exception e) {
                 log.error("proxy调用es出错，错误信息：{}", ExceptionUtils.getStackTrace(e));
                 ProxyRunner.errorProcess(context, new CustomException("proxy调用es出错", e.getMessage()));

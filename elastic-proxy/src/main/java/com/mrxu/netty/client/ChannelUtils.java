@@ -9,6 +9,7 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -19,17 +20,28 @@ public class ChannelUtils {
         return channel.attr(PROXY_NETTY_CLIENT_ATTRIBUTE).get().get(channel.id().asLongText());
     }
 
-    public static void attributeChannel(SessionContext context, Channel esChannel) {
+    public static void attributeChannel(Channel esChannel,SessionContext context) {
         Attribute<ConcurrentHashMap<String, SessionContext>> attr = esChannel.attr(ChannelUtils.PROXY_NETTY_CLIENT_ATTRIBUTE);
         ConcurrentHashMap<String, SessionContext> attrMap = attr.get();
         attrMap.put(esChannel.id().asLongText(), context);
     }
 
-    public static void release(FullHttpResponse response) {
-        try {
-            ReferenceCountUtil.release(response);
-        } catch (Throwable throwable) {
-            log.info("释放buffer出错，错误信息：{}", ExceptionUtils.getStackTrace(throwable));
+    public static void clearAttribute(Channel channel) {
+        Attribute<ConcurrentHashMap<String, SessionContext>> attr = channel.attr(ChannelUtils.PROXY_NETTY_CLIENT_ATTRIBUTE);
+        ConcurrentHashMap<String, SessionContext> attrMap = attr.get();
+        attrMap.clear();
+    }
+
+    public static void cancel(Channel channel) {
+        SessionContext sessionContext = getSessionContext(channel);
+        if (Objects.nonNull(sessionContext)) {
+            sessionContext.cancel();
+            sessionContext.getElasticSearchInfo().release(channel);
         }
+    }
+
+    public static Boolean completed(Channel channel) {
+        SessionContext sessionContext = getSessionContext(channel);
+        return Objects.isNull(sessionContext) ? true : !sessionContext.getCompleted();
     }
 }
