@@ -1,21 +1,22 @@
 package com.mrxu.netty.filter.pre;
 
 import com.mrxu.exception.CustomException;
-import com.mrxu.model.CommonDTO;
-import com.mrxu.netty.boot.ProxyRunner;
+import com.mrxu.model.SearchDTO;
 import com.mrxu.netty.filter.AbstractFilter;
 import com.mrxu.netty.filter.AbstractFilterContext;
 import com.mrxu.netty.pojo.SessionContext;
+import com.mrxu.netty.util.ByteBufManager;
+import com.mrxu.netty.util.IndexPatternUtil;
+import com.mrxu.sql.component.SqlParserInterface;
 import com.mrxu.sql.exception.SqlParseException;
 import io.netty.handler.codec.http.FullHttpRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.elasticsearch.common.collect.Tuple;
+
 import java.sql.SQLFeatureNotSupportedException;
-import static com.mrxu.netty.util.ByteBufManager.close;
-import static com.mrxu.netty.util.IndexPatternUtil.*;
-import static com.mrxu.sql.component.SearchComponent.singleton;
+
 
 /**
  * 该类只解析SQL，也就是原生请求不到这一步
@@ -28,50 +29,37 @@ public class SqlParseAndCheckFilter extends AbstractFilter {
     @Override
     public void run(final AbstractFilterContext filterContext, final SessionContext sessionContext) throws CustomException {
         FullHttpRequest fullHttpRequest = sessionContext.getFullHttpRequest();
-        if (!fullHttpRequest.method().name().equalsIgnoreCase("POST")) {
-            ProxyRunner.errorProcess(sessionContext, new CustomException("method error", "request method must be POST"));
-            close(sessionContext);
-            return;
-        }
-
-        try {
-            CommonDTO commonDTO = getCommonDTO(fullHttpRequest);
-            if (StringUtils.isNotEmpty(commonDTO.getSql())) {
-                try {
-                    Tuple<String[], String> tuple = singleton.explain2Tuple(commonDTO.getSql());
-                    String[] indexes = tuple.v1();
-                    boolean b = validIndex(indexes);
-                    if (!b) {
-                        ProxyRunner.errorProcess(sessionContext, new CustomException("index does not match", "indices do not match same index pattern"));
-                        close(sessionContext);
-                        return;
-                    }
-                    commonDTO.setIndices(indexes);
-                    if (StringUtils.isBlank(commonDTO.getIndex())) {
-                        commonDTO.setIndex(getIndices(indexes));
-                    }
-                    commonDTO.setJson(tuple.v2());
-                    //sql校验index pattern
-                    String indexPattern = getPattern(indexes);
-
-                    sessionContext.setIndexPattern(indexPattern);
-                } catch (SQLFeatureNotSupportedException | SqlParseException e) {
-                    log.error("解析SQL出错，错误信息:{}", ExceptionUtils.getStackTrace(e));
-                    ProxyRunner.errorProcess(sessionContext, new CustomException("sql parser error", e.getMessage()));
-                    close(sessionContext);
+        //获取请求的请求体
+        SearchDTO searchDTO = IndexPatternUtil.getSearchDTO(fullHttpRequest);
+        if (StringUtils.isNotEmpty(searchDTO.getSql())) {
+            try {
+                //解析SQL，拿到索引与解析后的DSL语句
+                Tuple<String[], String> tuple = SqlParserInterface.singleton.explain2Tuple(searchDTO.getSql());
+                String[] indexes = tuple.v1();
+                boolean bool = IndexPatternUtil.validIndex(indexes);
+                if (!bool) {
+                    ByteBufManager.close(sessionContext,new CustomException("index does not match", "indices do not match same index pattern"));
                     return;
                 }
-            } else {
-                //没有SQL情况，index是直接传的
-                String indexPattern = getPattern(commonDTO.getIndex());
+                searchDTO.setIndices(indexes);
+                if (StringUtils.isBlank(searchDTO.getIndex())) {
+                    searchDTO.setIndex(IndexPatternUtil.getIndices(indexes));
+                }
+                searchDTO.setJson(tuple.v2());
+                //sql校验index pattern
+                String indexPattern = IndexPatternUtil.getPattern(indexes);
                 sessionContext.setIndexPattern(indexPattern);
+            } catch (SQLFeatureNotSupportedException | SqlParseException e) {
+                log.error("解析SQL出错，错误信息:{}", ExceptionUtils.getStackTrace(e));
+                ByteBufManager.close(sessionContext,new CustomException("sql parser error", e.getMessage()));
+                return;
             }
-
-            sessionContext.setCommonDTO(commonDTO);
-
-        } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
+        } else {
+            //没有SQL情况，index是直接传的
+            String indexPattern = IndexPatternUtil.getPattern(searchDTO.getIndex());
+            sessionContext.setIndexPattern(indexPattern);
         }
+        sessionContext.setSearchDTO(searchDTO);
         filterContext.fireNext(sessionContext);
     }
 
@@ -79,5 +67,4 @@ public class SqlParseAndCheckFilter extends AbstractFilter {
     public String name() {
         return DEFAULT_NAME;
     }
-
- }
+}

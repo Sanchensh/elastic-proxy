@@ -49,7 +49,6 @@ public class SqlParser {
     public SqlParser() {
 
     }
-
     public Select parseSelect(SQLQueryExpr mySqlExpr) throws SqlParseException {
         MySqlSelectQueryBlock query = (MySqlSelectQueryBlock) mySqlExpr.getSubQuery().getQuery();
         SubQueryParser subQueryParser = new SubQueryParser(this);
@@ -59,47 +58,32 @@ public class SqlParser {
             return parseSelect(query);
         }
     }
-
     public Select parseSelect(MySqlSelectQueryBlock query) throws SqlParseException {
-
         Select select = new Select();
         WhereParser whereParser = new WhereParser(this, query, fieldMaker);
-
         if (query.getAttribute(NESTED_JOIN_TYPE) != null) {
             select.setNestedJoinType((SQLJoinTableSource.JoinType) query.getAttribute(NESTED_JOIN_TYPE));
         }
-
         findSelect(query, select, query.getFrom().getAlias());
-
         select.getFrom().addAll(findFrom(query.getFrom()));
-
         select.setWhere(whereParser.findWhere());
-
         select.fillSubQueries();
-
         select.getHints().addAll(parseHints(query.getHints()));
-
         findLimit(query.getLimit(), select);
-
         if (query.getOrderBy() != null) {
             addOrderByToSelect(select, query, query.getOrderBy().getItems(), null);
         }
-
         if (query.getGroupBy() != null) {
             findGroupBy(query, select);
         }
-
         return select;
     }
 
     public Delete parseDelete(SQLDeleteStatement deleteStatement) throws SqlParseException {
         Delete delete = new Delete();
         WhereParser whereParser = new WhereParser(this, deleteStatement);
-
         delete.getFrom().addAll(findFrom(deleteStatement.getTableSource()));
-
         delete.setWhere(whereParser.findWhere());
-
         return delete;
     }
 
@@ -179,7 +163,6 @@ public class SqlParser {
         if (where == null) {
             return null;
         }
-
         if (where instanceof Condition) {
             Condition condition = (Condition) where;
             String fieldName = condition.getName();
@@ -189,8 +172,7 @@ public class SqlParser {
                     return alias;
                 }
             }
-            throw new SqlParseException(String.format("Field [%s] with condition [%s] does not contain an alias",
-                    fieldName, condition.toString()));
+            throw new SqlParseException(String.format("Field [%s] with condition [%s] does not contain an alias", fieldName, condition.toString()));
         }
         List<String> sameAliases = new ArrayList<>();
         if (where.getWheres() != null && where.getWheres().size() > 0) {

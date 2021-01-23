@@ -8,7 +8,7 @@ import org.elasticsearch.common.collect.Tuple;
 
 import java.sql.SQLFeatureNotSupportedException;
 
-import static com.mrxu.sql.component.SearchComponent.singleton;
+import static com.mrxu.sql.component.SqlParserInterface.singleton;
 
 public class UpdateParser {
 

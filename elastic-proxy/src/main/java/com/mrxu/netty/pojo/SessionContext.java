@@ -1,134 +1,129 @@
 package com.mrxu.netty.pojo;
 
 import com.mrxu.exception.CustomException;
-import com.mrxu.model.CommonDTO;
-import com.mrxu.model.ElasticSearchInfo;
+import com.mrxu.model.ElasticsearchNodeInfo;
+import com.mrxu.model.SearchDTO;
 import com.mrxu.netty.boot.ProxyRunner;
+import com.mrxu.netty.client.ChannelUtil;
 import com.mrxu.netty.thread.TimerHolder;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.DefaultChannelId;
-import io.netty.channel.pool.FixedChannelPool;
 import io.netty.handler.codec.http.*;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
-import static com.mrxu.netty.util.HttpCode.HTTP_OK_CODE;
-import static io.netty.handler.codec.http.HttpHeaders.Names.*;
+import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-import static io.netty.util.CharsetUtil.UTF_8;
 
 @Data
+@Slf4j
 public class SessionContext {
 
-    private long time;
-
-    private TimeUnit timeUnit;
-
+    //唯一的key
     private String key = DefaultChannelId.newInstance().asLongText();
-    //判断这次请求是否完成，再获取esChannel时候会做判断
-    private Boolean completed = false;
 
-    private CustomException customException;
+    //该请求的Channel，该Channel会写回调用es获取的数据
+    private Channel serverChannel;
 
-    private HttpResponseStatus httpResponseStatus = HttpResponseStatus.OK;
-
+    //请求es的客户端Channel，可以随时随地操作
     private Channel clientChannel;
 
-    private Channel esChannel;
+    //超时时间
+    private long timeout;
 
+    //错误信息
+    private Throwable throwable;
+
+    //是否打印堆栈信息
+    private Boolean printStackInfo;
+
+    //集群id
+    private Integer clusterId;
+
+    //请求的indexPattern
+    private String indexPattern;
+
+    //返回给客户端的状态码
+    private HttpResponseStatus httpResponseStatus = HttpResponseStatus.OK;
+
+    //返回给客户端的头信息
+    private HttpHeaders responseHttpHeaders = new DefaultHttpHeaders(false);
+
+    //客户端请求数据
     private FullHttpRequest fullHttpRequest;
 
-    private CommonDTO commonDTO;
+    //客户端请求体
+    private SearchDTO searchDTO;
 
+    //客户端请求对应的APPID
     private String appId;
 
+    //客户端请求token
     private String token;
+
+    //请求es的host，这里主要是防止字符串多次拼接与拆解
+    private String restRequestHost;
 
     //请求es的uri
     private String restRequestUri;
 
+    //请求es的Method
     private String restRequestMethod;
 
-    private String indexPattern;
-
-    private ElasticSearchInfo elasticSearchInfo;
-
-    //    消息是否发送过，避免重复发送
+    //消息是否发送过错误消息，避免重复发送
     private boolean bodySend;
-    /**
-     * 获取返回的response对象
-     */
-    private HttpHeaders responseHttpHeaders = new DefaultHttpHeaders(false);
+
+    //错误信息
+    private ByteBuf errorResponseBody;
 
     // 返回的httpVersion
     private HttpVersion responseHttpVersion = HTTP_1_1;
 
-    public SessionContext() {
-        this(10, TimeUnit.SECONDS);
+    public SessionContext(Channel serverChannel) {
+        this(2000, serverChannel);
     }
 
-    public SessionContext(long time, TimeUnit timeUnit) {
-        this.time = time;
-        this.timeUnit = timeUnit;
+    public SessionContext(long timeout, Channel serverChannel) {
+        this.timeout = timeout <= 0 ? 2000 : timeout;
+        this.serverChannel = serverChannel;
+        this.startTimer();//该请求超时设置
     }
 
-    public void setClientChannel(Channel clientChannel) {
-        this.clientChannel = clientChannel;
-        start();
-    }
-
-    public void cancel() {
-        TimerHolder.cancel(key);
-    }
-
-    private void start() {
+    private void startTimer() {
         TimerHolder.schedule(key, () -> {
-            completed = true;
-            ProxyRunner.errorProcess(this, new CustomException(408, "timeout", "this request is timeout"));
-        }, time, timeUnit);
+            if (clientChannel != null) {//如果clientChannel不为空,则丢掉这个Channel，因为超时可能是该Channel导致的，如果放回池中可能还会出现类似问题
+                ChannelUtil.clearSessionContext(clientChannel);
+                clientChannel.close();
+            }
+            ProxyRunner.errorProcess(this, new CustomException(HttpResponseStatus.REQUEST_TIMEOUT.code(), "Request Timeout", "This request is timeout,please retry"));
+        }, timeout, TimeUnit.MILLISECONDS);
     }
 
-    public DefaultFullHttpRequest getEsRequest(ElasticSearchInfo info) throws URISyntaxException, UnsupportedEncodingException {
-        URI url = new URI(restRequestUri);
-        DefaultFullHttpRequest request = new DefaultFullHttpRequest(
-                HTTP_1_1, HttpMethod.valueOf(restRequestMethod),
-                url.toASCIIString(),
-                Unpooled.wrappedBuffer(commonDTO.getJson().getBytes(UTF_8)));
+    public void stopTimer() {
+        TimerHolder.stop(key);
+    }
+
+    //获取请求es的请求信息
+    public FullHttpRequest getRequest(ElasticsearchNodeInfo elasticsearchNodeInfo) {
+        DefaultFullHttpRequest request = new DefaultFullHttpRequest(HTTP_1_1,
+                HttpMethod.valueOf(restRequestMethod),
+                restRequestUri,
+                StringUtils.isNotBlank(searchDTO.getJson()) ? wrappedBuffer(searchDTO.getJson().getBytes(StandardCharsets.UTF_8)) : EMPTY_BUFFER);
         // 构建http请求
-        setHeaders(request.headers(), request.content(), info.getAuthorization());
+        request.headers().set(HttpHeaderNames.CONNECTION, "keep-alive");
+        request.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json;charset=UTF-8");
+        request.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
+        if (StringUtils.isNoneBlank(elasticsearchNodeInfo.getAuthorization())) {
+            request.headers().set("Authorization", elasticsearchNodeInfo.getAuthorization());
+        }
         return request;
     }
-
-    public void sendErrorMessage(CustomException exception){
-        clientChannel.writeAndFlush(getFullHttpResponse(exception));
-    }
-
-    private FullHttpResponse getFullHttpResponse(CustomException exception) {
-        ByteBuf byteBuf = Unpooled.wrappedBuffer(exception.getMessage().getBytes());
-        FullHttpResponse response = new DefaultFullHttpResponse(responseHttpVersion, httpResponseStatus, byteBuf);
-        setHeaders(response.headers(), byteBuf);
-        return response;
-    }
-
-    private void setHeaders(HttpHeaders headers, ByteBuf byteBuf, String authorization) {
-        setHeaders(headers,byteBuf);
-        if (StringUtils.isNoneBlank(authorization)) {
-            headers.set("Authorization", authorization);
-        }
-    }
-    private void setHeaders(HttpHeaders headers, ByteBuf byteBuf) {
-        headers.set(HttpHeaderNames.CONTENT_TYPE, "application/json;charset=utf-8");
-        headers.set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
-        headers.set(HttpHeaders.Names.CONTENT_LENGTH, byteBuf == null ? 0 : byteBuf.readableBytes());
-    }
-
 }
 
 

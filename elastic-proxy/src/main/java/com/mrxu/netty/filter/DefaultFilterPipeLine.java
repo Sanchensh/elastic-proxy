@@ -1,5 +1,6 @@
 package com.mrxu.netty.filter;
 
+
 import com.mrxu.netty.trait.Filter;
 import com.mrxu.netty.trait.FilterPipeLine;
 
@@ -7,36 +8,20 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 //单例
-public class DefaultFilterPipeLine implements FilterPipeLine {
-
+public enum  DefaultFilterPipeLine implements FilterPipeLine {
+    instance;
     private final Map<String, AbstractFilterContext> name2ctx = new ConcurrentHashMap<>(16);
     private final List<String> index = new ArrayList<>();
-    private volatile static DefaultFilterPipeLine instance;
-
-    private DefaultFilterPipeLine() {
-    }
-
-    public static FilterPipeLine getInstance() {
-        if (instance == null) {
-            synchronized (DefaultFilterPipeLine.class) {
-                if (instance == null) {
-                    instance = new DefaultFilterPipeLine();
-                }
-            }
-        }
-        return instance;
-    }
-
     @Override
     public void addLastSegment(Filter... filters) {
-
         for (Filter filter : filters) {
 			checkDuplicateName(filter.name());
             index.add(filter.name());
             name2ctx.put(filter.name(), new FilterContext(filter));
         }
-        if (index.size() <= 1)
+        if (index.size() <= 1) {
             return;
+        }
         for (int i = 0; i < index.size() - 1; i++) {
             name2ctx.get(index.get(i)).next = name2ctx.get(index.get(i + 1));
         }
@@ -54,7 +39,6 @@ public class DefaultFilterPipeLine implements FilterPipeLine {
 
     @Override
     public AbstractFilterContext get(String name) {
-
         return name2ctx.get(name);
     }
 

@@ -3,11 +3,18 @@ package com.mrxu.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * 将异常包装秤类似于es返回异常数据的格式
+ */
 @Data
 public class ErrorMsg {
-    private int status = 400;
+//    返回状态码
+    private int status;
+//    错误类型
     private String type;
+//    错误原因
     private String reason;
+//    详细信息
     private Error error;
 
     @Data
@@ -31,8 +38,9 @@ public class ErrorMsg {
         this.reason = reason;
         this.error = error;
     }
-    public ErrorMsg(int status,String type, String reason) {
-        this(type,reason);
+
+    public ErrorMsg(int status, String type, String reason) {
+        this(type, reason);
         this.status = status;
     }
 }

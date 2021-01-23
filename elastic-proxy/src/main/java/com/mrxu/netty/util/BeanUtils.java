@@ -25,7 +25,6 @@ public class BeanUtils implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        if (Objects.isNull(context))
-            context = applicationContext;
+        if (Objects.isNull(context)) context = applicationContext;
     }
 }

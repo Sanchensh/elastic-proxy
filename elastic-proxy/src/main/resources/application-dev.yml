@@ -1,0 +1,17 @@
+server:
+  port: 8099
+proxy:
+  client:
+    retry: 3            #请求es最大尝试次数
+    client_thread: 512  #client 线程数
+    idle_time: 10       #channel最大闲置时间
+    pool_size: 100      #channel pool最大容量
+  server:
+    sniffer_time: 10       #嗅探间隔
+    boss: 128              #boss最大线程数
+    worker: 256            #worker最大线程数
+    server_keepalive_timeout: 60       #server端keepalive最大时间
+    core_thread: 64                    #业务线程池核心线程数量
+    max_thread: 128                    #业务线程池最大线程数量
+    netty_port: 8081                   #netty的端口
+    refresh_cache: 60000               #缓存刷新间隔

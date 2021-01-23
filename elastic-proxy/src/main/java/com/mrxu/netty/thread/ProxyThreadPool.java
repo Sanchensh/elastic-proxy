@@ -1,29 +1,32 @@
 package com.mrxu.netty.thread;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import com.mrxu.netty.prop.PropertiesUtil;
 
-import static com.mrxu.netty.prop.ProxySearchProperties.WORKER_GROUP_SIZE;
+import java.util.concurrent.*;
+
 
 public class ProxyThreadPool {
     private static final int defaultQueueSize = 100;
     private static final int defaultKeepAliveTime = 60;
+    private static final ProxyRejectHandler handler = new ProxyRejectHandler();
     private static final BlockingQueue queue = new LinkedBlockingQueue(defaultQueueSize);
     //使用线程池将请求放入线程池中处理，服务器规格16c32g，则16<<6=1024
-    private static final ThreadPoolExecutor ThreadPool = new ThreadPoolExecutor(
-            WORKER_GROUP_SIZE << 2,
-            WORKER_GROUP_SIZE << 4,
+    public static final ThreadPoolExecutor ThreadPool = new ThreadPoolExecutor(
+            PropertiesUtil.properties.getCoreThread(),
+            PropertiesUtil.properties.getMaxThread(),
             defaultKeepAliveTime,
             TimeUnit.SECONDS,
             queue,
-            ProxyThreadFactory.create("proxy", true));
+            DefaultThreadFactory.create("proxy", true),handler);
     static {
         ThreadPool.allowCoreThreadTimeOut(true);
     }
 
-    public static void submit(Runnable runnable){
-        ThreadPool.submit(runnable);
+    private static class ProxyRejectHandler implements RejectedExecutionHandler{
+        //重新执行
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            r.run();
+        }
     }
 }

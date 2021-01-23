@@ -24,6 +24,7 @@ import com.alibaba.druid.sql.ast.statement.SQLTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
 import com.alibaba.druid.sql.parser.SQLExprParser;
 import com.alibaba.druid.sql.parser.Token;
+import com.mrxu.sql.domain.IndexStatement;
 import com.mrxu.sql.domain.KVValue;
 import com.mrxu.sql.exception.SqlParseException;
 import com.mrxu.sql.parser.ElasticSqlExprParser;

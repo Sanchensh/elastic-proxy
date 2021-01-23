@@ -3,7 +3,7 @@ package com.mrxu.netty.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mrxu.exception.CustomException;
-import com.mrxu.model.CommonDTO;
+import com.mrxu.model.SearchDTO;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.FullHttpRequest;
 
@@ -13,10 +13,10 @@ public class IndexPatternUtil {
 
     public static final String suffix = "espaas";
 
-    public static CommonDTO getCommonDTO(FullHttpRequest request) {
+    public static SearchDTO getSearchDTO(FullHttpRequest request) {
         ByteBuf byteBuf = request.content();
         String json = byteBuf.toString(UTF_8);
-        return JSONObject.toJavaObject(JSON.parseObject(json), CommonDTO.class);
+        return JSONObject.toJavaObject(JSON.parseObject(json), SearchDTO.class);
     }
 
     //校验是否匹配同一规则
@@ -34,7 +34,7 @@ public class IndexPatternUtil {
                 } else {
                     bool = false;
                 }
-            } else if (indices[i].contains(suffix) && indices[j].contains(suffix)){//都有后缀的情况
+            } else if (indices[i].contains(suffix) && indices[j].contains(suffix)) {//都有后缀的情况
                 String first = indices[i].substring(0, indices[i].indexOf(suffix) + length);
                 String last;
                 if (i == j) {
@@ -64,10 +64,11 @@ public class IndexPatternUtil {
     public static String getIndices(String[] indices) {
         StringBuffer s = new StringBuffer();
         for (int i = 0; i < indices.length; i++) {
-            if (i == indices.length - 1)
+            if (i == indices.length - 1) {
                 s.append(indices[i]);
-            else
+            } else {
                 s.append(indices[i]).append(",");
+            }
         }
         return s.toString();
     }
