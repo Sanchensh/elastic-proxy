@@ -25,7 +25,9 @@ import java.util.Objects;
  */
 @Slf4j
 public class ESRequest {
-   private static ClusterManager clusterManager = BeanUtils.getBean("ClusterManager",ClusterManager.class);
+
+    private static ClusterManager clusterManager = BeanUtils.getBean("ClusterManager", ClusterManager.class);
+
     public static void performRequestByNetty(final SessionContext sessionContext) {
         ProxyThreadPool.ThreadPool.submit(() -> callEs(sessionContext, 0));
     }

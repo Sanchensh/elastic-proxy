@@ -18,6 +18,7 @@ public class ElasticsearchCache {
         elasticsearchNodeInfo.setHost(PropertiesUtil.properties.getIp() + ":"+PropertiesUtil.properties.getPort());
         elasticsearchNodeInfo.setUsername(PropertiesUtil.properties.getUsername());
         elasticsearchNodeInfo.setPassword(PropertiesUtil.properties.getPassword());
+        clusterManager.addDeadNode(elasticsearchNodeInfo);
         return clusterManager;
     }
 }

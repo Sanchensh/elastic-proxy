@@ -61,12 +61,6 @@ public class SessionContext {
     //客户端请求体
     private SearchDTO searchDTO;
 
-    //客户端请求对应的APPID
-    private String appId;
-
-    //客户端请求token
-    private String token;
-
     //请求es的host，这里主要是防止字符串多次拼接与拆解
     private String restRequestHost;
 

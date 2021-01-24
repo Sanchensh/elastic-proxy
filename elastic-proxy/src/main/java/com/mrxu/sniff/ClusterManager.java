@@ -44,6 +44,7 @@ public class ClusterManager implements AutoCloseable {
 
     /**
      * 添加节点
+     *
      * @param elasticsearchNodeInfos
      */
     public void addActiveNodes(List<ElasticsearchNodeInfo> elasticsearchNodeInfos) {
@@ -95,15 +96,22 @@ public class ClusterManager implements AutoCloseable {
             List<String> hosts = JsonPath.read(data, "$.nodes..http.bound_address[-1]");
             if (CollectionUtils.isNotEmpty(hosts)) {
                 List<NodeInfo> nodeInfos = hosts.stream().map(host -> {
-                    String[] split = host.split(":");
+                    String[] ipAndPort;
+                    if (host.startsWith("[")) {
+                        String ip = PropertiesUtil.properties.getIp();
+                        String port = PropertiesUtil.properties.getPort().toString();
+                        ipAndPort = new String[]{ip, port};
+                    } else {
+                        ipAndPort = host.split(":");
+                    }
                     NodeInfo nodeInfo = NodeInfo.builder()
-                            .ip(split[0])
-                            .port(Integer.parseInt(split[1]))
-                            .host(host)
+                            .ip(ipAndPort[0])
+                            .port(Integer.parseInt(ipAndPort[1]))
+                            .host(ipAndPort[0] + ":" + ipAndPort[1])
                             .build();
                     return nodeInfo;
                 }).collect(Collectors.toList());
-                synchronized (this){
+                synchronized (this) {
                     //直接将最新节点赋值给activeNodes
                     activeNodes = nodeInfos.stream()
                             .map(nodeInfo -> {
@@ -141,9 +149,11 @@ public class ClusterManager implements AutoCloseable {
 
     private class Task implements Runnable {
         final long nextTaskDelay;
+
         Task(long nextTaskDelay) {
             this.nextTaskDelay = nextTaskDelay;
         }
+
         @Override
         public void run() {
             sniffNodes();

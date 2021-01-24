@@ -22,12 +22,12 @@ public class AuthorizationCheckFilter extends AbstractFilter {
 
     @Override
     public void run(AbstractFilterContext filterContext, SessionContext sessionContext) throws CustomException {
-        FullHttpRequest fullHttpRequest = sessionContext.getFullHttpRequest();
-        String authorization = fullHttpRequest.headers().get("authorization");
-        if (StringUtils.isBlank(authorization)) {
-            closed(sessionContext);
-            return;
-        }
+//        FullHttpRequest fullHttpRequest = sessionContext.getFullHttpRequest();
+//        String authorization = fullHttpRequest.headers().get("authorization");
+//        if (StringUtils.isBlank(authorization)) {
+//            closed(sessionContext);
+//            return;
+//        }
         //todo  权限校验
         filterContext.fireNext(sessionContext);
     }

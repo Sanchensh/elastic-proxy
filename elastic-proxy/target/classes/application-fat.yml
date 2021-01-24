@@ -7,7 +7,7 @@ proxy:
     idle_time: 10       #channel最大闲置时间
     pool_size: 100      #channel pool最大容量
   server:
-    sniffer_time: 10       #嗅探间隔
+    sniffer_time: 1       #嗅探间隔
     boss: 128              #boss最大线程数
     worker: 256            #worker最大线程数
     server_keepalive_timeout: 60       #server端keepalive最大时间

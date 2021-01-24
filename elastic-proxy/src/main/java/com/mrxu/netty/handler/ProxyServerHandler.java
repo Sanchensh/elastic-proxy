@@ -27,7 +27,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         try {
             FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
-            String timeout = fullHttpRequest.headers().get("socketTimeout");
+            String timeout = fullHttpRequest.headers().get("timeout");
             SessionContext context = StringUtils.isNotBlank(timeout) ?
                     new SessionContext(Long.parseLong(timeout), ctx.channel()) :
                     new SessionContext(ctx.channel());
