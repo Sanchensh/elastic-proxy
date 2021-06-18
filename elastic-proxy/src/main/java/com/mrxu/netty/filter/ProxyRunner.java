@@ -1,4 +1,4 @@
-package com.mrxu.netty.boot;
+package com.mrxu.netty.filter;
 
 import com.mrxu.netty.filter.DefaultFilterPipeLine;
 import com.mrxu.netty.filter.error.HandleErrorFilter;

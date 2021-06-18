@@ -1,9 +1,9 @@
 package com.mrxu.netty.pojo;
 
 import com.mrxu.exception.CustomException;
-import com.mrxu.model.ElasticsearchNodeInfo;
+import com.mrxu.model.ClusterNodeInfo;
 import com.mrxu.model.SearchDTO;
-import com.mrxu.netty.boot.ProxyRunner;
+import com.mrxu.netty.filter.ProxyRunner;
 import com.mrxu.netty.client.ChannelUtil;
 import com.mrxu.netty.thread.TimerHolder;
 import io.netty.buffer.ByteBuf;
@@ -104,7 +104,7 @@ public class SessionContext {
     }
 
     //获取请求es的请求信息
-    public FullHttpRequest getRequest(ElasticsearchNodeInfo elasticsearchNodeInfo) {
+    public FullHttpRequest getRequest(ClusterNodeInfo clusterNodeInfo) {
         DefaultFullHttpRequest request = new DefaultFullHttpRequest(HTTP_1_1,
                 HttpMethod.valueOf(restRequestMethod),
                 restRequestUri,
@@ -113,8 +113,8 @@ public class SessionContext {
         request.headers().set(HttpHeaderNames.CONNECTION, "keep-alive");
         request.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json;charset=UTF-8");
         request.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
-        if (StringUtils.isNoneBlank(elasticsearchNodeInfo.getAuthorization())) {
-            request.headers().set("Authorization", elasticsearchNodeInfo.getAuthorization());
+        if (StringUtils.isNoneBlank(clusterNodeInfo.getAuthorization())) {
+            request.headers().set("Authorization", clusterNodeInfo.getAuthorization());
         }
         return request;
     }

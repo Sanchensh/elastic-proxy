@@ -1,7 +1,7 @@
 package com.mrxu.netty.filter.rest;
 
 import com.mrxu.exception.CustomException;
-import com.mrxu.model.ElasticsearchNodeInfo;
+import com.mrxu.model.ClusterNodeInfo;
 import com.mrxu.netty.client.ChannelUtil;
 import com.mrxu.netty.client.DefaultChannelPool;
 import com.mrxu.netty.pojo.SessionContext;
@@ -38,40 +38,40 @@ public class ESRequest {
      * @param retryCount     当前重试了多少次
      */
     private static void callEs(final SessionContext sessionContext, int retryCount) {
-        ElasticsearchNodeInfo elasticsearchNodeInfo = clusterManager.getActiveNode();
-        if (Objects.isNull(elasticsearchNodeInfo)) {
+        ClusterNodeInfo clusterNodeInfo = clusterManager.getActiveNode();
+        if (Objects.isNull(clusterNodeInfo)) {
             ByteBufManager.close(sessionContext, new CustomException("所有es节点不可用", "所有es节点不可用，请联系管理员或重试或等待下次嗅探"));
             return;
         }
-        FullHttpRequest fullHttpRequest = sessionContext.getRequest(elasticsearchNodeInfo);
+        FullHttpRequest fullHttpRequest = sessionContext.getRequest(clusterNodeInfo);
         //将host设置到context中，可以直接使用，避免字符串的拼接与拆解
-        sessionContext.setRestRequestHost(elasticsearchNodeInfo.getHost());
-        DefaultChannelPool.ChannelDTO channelDTO = DefaultChannelPool.INSTANCE.poll(elasticsearchNodeInfo.getIp(), elasticsearchNodeInfo.getPort(), elasticsearchNodeInfo.getHost());
+        sessionContext.setRestRequestHost(clusterNodeInfo.getHost());
+        DefaultChannelPool.ChannelDTO channelDTO = DefaultChannelPool.INSTANCE.poll(clusterNodeInfo.getIp(), clusterNodeInfo.getPort(), clusterNodeInfo.getHost());
         if (Objects.nonNull(channelDTO.getBootstrap())) {//如果是新建立的连接
             Bootstrap bootstrap = channelDTO.getBootstrap();
             bootstrap.connect().addListener((ChannelFutureListener) future -> {
                 if (future.isSuccess())
-                    sendRequest(future.channel(), sessionContext, elasticsearchNodeInfo, fullHttpRequest, retryCount);
+                    sendRequest(future.channel(), sessionContext, clusterNodeInfo, fullHttpRequest, retryCount);
                 else
-                    handleException(sessionContext, elasticsearchNodeInfo, future.cause(), retryCount);
+                    handleException(sessionContext, clusterNodeInfo, future.cause(), retryCount);
             });
         } else {//如果连接池有连接，并且返回，则直接用已有的连接调用
             Channel channel = channelDTO.getChannel();
-            sendRequest(channel, sessionContext, elasticsearchNodeInfo, fullHttpRequest, retryCount);
+            sendRequest(channel, sessionContext, clusterNodeInfo, fullHttpRequest, retryCount);
         }
     }
 
-    private static void sendRequest(Channel channel, SessionContext sessionContext, ElasticsearchNodeInfo elasticsearchNodeInfo, FullHttpRequest fullHttpRequest, int retryCount) {
+    private static void sendRequest(Channel channel, SessionContext sessionContext, ClusterNodeInfo clusterNodeInfo, FullHttpRequest fullHttpRequest, int retryCount) {
         ChannelUtil.attributeSessionContext(channel, sessionContext);
         sessionContext.setClientChannel(channel);
         channel.writeAndFlush(fullHttpRequest).addListener((ChannelFutureListener) future -> {
-            if (!future.isSuccess()) handleException(sessionContext, elasticsearchNodeInfo, future.cause(), retryCount);
+            if (!future.isSuccess()) handleException(sessionContext, clusterNodeInfo, future.cause(), retryCount);
         });
     }
 
-    private static void handleException(SessionContext sessionContext, ElasticsearchNodeInfo elasticsearchNodeInfo, Throwable throwable, int retryCount) {
+    private static void handleException(SessionContext sessionContext, ClusterNodeInfo clusterNodeInfo, Throwable throwable, int retryCount) {
         log.error("{}节点请求失败，正在重试。错误信息:{}", sessionContext.getRestRequestHost(), ExceptionUtils.getStackTrace(throwable));
-        clusterManager.addDeadNode(elasticsearchNodeInfo);//将请求失败的节点放到黑名单中，等待嗅探的时候在考虑是否重新启用该节点
+        clusterManager.addDeadNode(clusterNodeInfo);//将请求失败的节点放到黑名单中，等待嗅探的时候在考虑是否重新启用该节点
         if (retryCount < PropertiesUtil.properties.getRetry()) //如果当前请求失败，需要重试
             callEs(sessionContext, retryCount + 1);
         else

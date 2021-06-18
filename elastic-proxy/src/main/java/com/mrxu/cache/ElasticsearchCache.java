@@ -1,6 +1,6 @@
 package com.mrxu.cache;
 
-import com.mrxu.model.ElasticsearchNodeInfo;
+import com.mrxu.model.ClusterNodeInfo;
 import com.mrxu.netty.prop.PropertiesUtil;
 import com.mrxu.sniff.ClusterManager;
 import org.springframework.context.annotation.Bean;
@@ -12,14 +12,14 @@ public class ElasticsearchCache {
     @Bean("ClusterManager")
     public ClusterManager getClusterManager() {
         ClusterManager clusterManager = new ClusterManager();
-        ElasticsearchNodeInfo elasticsearchNodeInfo = new ElasticsearchNodeInfo();
-        elasticsearchNodeInfo.setClusterName("elasticsearch");
-        elasticsearchNodeInfo.setIp(PropertiesUtil.properties.getIp());
-        elasticsearchNodeInfo.setPort(PropertiesUtil.properties.getPort());
-        elasticsearchNodeInfo.setHost(PropertiesUtil.properties.getIp() + ":" + PropertiesUtil.properties.getPort());
-        elasticsearchNodeInfo.setUsername(PropertiesUtil.properties.getUsername());
-        elasticsearchNodeInfo.setPassword(PropertiesUtil.properties.getPassword());
-        clusterManager.addDeadNode(elasticsearchNodeInfo);
+        ClusterNodeInfo clusterNodeInfo = new ClusterNodeInfo();
+        clusterNodeInfo.setClusterName("elasticsearch");
+        clusterNodeInfo.setIp(PropertiesUtil.properties.getIp());
+        clusterNodeInfo.setPort(PropertiesUtil.properties.getPort());
+        clusterNodeInfo.setHost(PropertiesUtil.properties.getIp() + ":" + PropertiesUtil.properties.getPort());
+        clusterNodeInfo.setUsername(PropertiesUtil.properties.getUsername());
+        clusterNodeInfo.setPassword(PropertiesUtil.properties.getPassword());
+        clusterManager.addDeadNode(clusterNodeInfo);
         return clusterManager;
     }
 }

@@ -1,7 +1,7 @@
 package com.mrxu.exception;
 
 import com.alibaba.fastjson.JSONObject;
-import com.mrxu.model.ErrorMsg;
+import com.mrxu.model.ErrorMessage;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class CustomException extends Exception {
@@ -17,7 +17,7 @@ public class CustomException extends Exception {
     }
 
     public CustomException(int status, String type, String reason) {
-        ErrorMsg msg = new ErrorMsg(status, type, reason);
+        ErrorMessage msg = new ErrorMessage(status, type, reason);
         this.message = JSONObject.toJSONString(msg);
         this.status = status;
     }

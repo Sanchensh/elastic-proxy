@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
-public class ElasticsearchNodeInfo {
+public class ClusterNodeInfo {
 //    集群id
     private Integer clusterId;
 //    集群名

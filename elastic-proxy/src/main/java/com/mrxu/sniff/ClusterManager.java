@@ -2,7 +2,7 @@ package com.mrxu.sniff;
 
 import com.alibaba.fastjson.JSON;
 import com.jayway.jsonpath.JsonPath;
-import com.mrxu.model.ElasticsearchNodeInfo;
+import com.mrxu.model.ClusterNodeInfo;
 import com.mrxu.netty.prop.PropertiesUtil;
 import lombok.Builder;
 import lombok.Data;
@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class ClusterManager implements AutoCloseable {
-    private List<ElasticsearchNodeInfo> activeNodes = new ArrayList<>();//白名单
-    private List<ElasticsearchNodeInfo> deadNodes = new ArrayList<>();//白名单
+    private List<ClusterNodeInfo> activeNodes = new ArrayList<>();//白名单
+    private List<ClusterNodeInfo> deadNodes = new ArrayList<>();//白名单
     private int index = 0;
     private Scheduler scheduler;
     private final RestTemplate restTemplate = new RestTemplate();
@@ -45,15 +45,15 @@ public class ClusterManager implements AutoCloseable {
     }
 
     //获取可用节点
-    public ElasticsearchNodeInfo getActiveNode() {
+    public ClusterNodeInfo getActiveNode() {
         synchronized (this) {
             return CollectionUtils.isEmpty(activeNodes) ? loadBalance.apply(deadNodes) : loadBalance.apply(activeNodes);
         }
     }
 
-    public void addDeadNode(ElasticsearchNodeInfo elasticsearchNodeInfo) {
-        deleteFromActiveNodes(elasticsearchNodeInfo.getHost());
-        deadNodes.add(elasticsearchNodeInfo);
+    public void addDeadNode(ClusterNodeInfo clusterNodeInfo) {
+        deleteFromActiveNodes(clusterNodeInfo.getHost());
+        deadNodes.add(clusterNodeInfo);
     }
 
     @Override
@@ -63,11 +63,11 @@ public class ClusterManager implements AutoCloseable {
 
     //从存活节点中删除一个
     private void deleteFromActiveNodes(String host) {
-        activeNodes.removeIf(elasticsearchNodeInfo -> host.equals(elasticsearchNodeInfo.getHost()));
+        activeNodes.removeIf(clusterNodeInfo -> host.equals(clusterNodeInfo.getHost()));
     }
 
     //节点轮询策略
-    private Function<List<ElasticsearchNodeInfo>, ElasticsearchNodeInfo> loadBalance = (infoList) -> {
+    private Function<List<ClusterNodeInfo>, ClusterNodeInfo> loadBalance = (infoList) -> {
         int size = infoList.size();
         if (index >= size) {
             index = 0;
@@ -78,12 +78,12 @@ public class ClusterManager implements AutoCloseable {
     };
 
     private void sniffNodes() {
-        ElasticsearchNodeInfo elasticsearchNodeInfo = getActiveNode();
+        ClusterNodeInfo clusterNodeInfo = getActiveNode();
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", elasticsearchNodeInfo.getAuthorization());
+            headers.add("Authorization", clusterNodeInfo.getAuthorization());
             HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
-            String url = "http://" + elasticsearchNodeInfo.getHost() + "/_nodes/http";
+            String url = "http://" + clusterNodeInfo.getHost() + "/_nodes/http";
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
             String data = responseEntity.getBody();
             List<String> hosts = JsonPath.read(data, "$.nodes..http.bound_address[-1]");
@@ -108,27 +108,27 @@ public class ClusterManager implements AutoCloseable {
                     //直接将最新节点赋值给activeNodes
                     activeNodes = nodeInfos.stream()
                             .map(nodeInfo -> {
-                                ElasticsearchNodeInfo elasticSearch = ElasticsearchNodeInfo.builder()
+                                ClusterNodeInfo elasticSearch = ClusterNodeInfo.builder()
                                         .ip(nodeInfo.getIp())
                                         .port(nodeInfo.getPort())
                                         .host(nodeInfo.getHost())
-                                        .password(elasticsearchNodeInfo.getPassword())
-                                        .authorization(elasticsearchNodeInfo.getAuthorization())
-                                        .clusterName(elasticsearchNodeInfo.getClusterName())
-                                        .clusterId(elasticsearchNodeInfo.getClusterId())
-                                        .clusterVersion(elasticsearchNodeInfo.getClusterVersion())
-                                        .username(elasticsearchNodeInfo.getUsername())
+                                        .password(clusterNodeInfo.getPassword())
+                                        .authorization(clusterNodeInfo.getAuthorization())
+                                        .clusterName(clusterNodeInfo.getClusterName())
+                                        .clusterId(clusterNodeInfo.getClusterId())
+                                        .clusterVersion(clusterNodeInfo.getClusterVersion())
+                                        .username(clusterNodeInfo.getUsername())
                                         .build();
                                 return elasticSearch;
                             }).collect(Collectors.toList());
                     deadNodes.clear();
                 }
-                log.info("集群名：{}，嗅探结果：{}", elasticsearchNodeInfo.getClusterName(), JSON.toJSONString(activeNodes.stream().map(ElasticsearchNodeInfo::getHost).collect(Collectors.toList())));
+                log.info("集群名：{}，嗅探结果：{}", clusterNodeInfo.getClusterName(), JSON.toJSONString(activeNodes.stream().map(ClusterNodeInfo::getHost).collect(Collectors.toList())));
             }
         } catch (Exception e) {
             log.error("集群嗅探异常:{}集群名称是：{}，当前存活节点:{}", ExceptionUtils.getStackTrace(e),
-                    elasticsearchNodeInfo.getClusterName(),
-                    JSON.toJSONString(activeNodes.stream().map(ElasticsearchNodeInfo::getHost).collect(Collectors.toList())));
+                    clusterNodeInfo.getClusterName(),
+                    JSON.toJSONString(activeNodes.stream().map(ClusterNodeInfo::getHost).collect(Collectors.toList())));
         }
     }
 

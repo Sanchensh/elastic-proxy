@@ -7,7 +7,7 @@ import lombok.Data;
  * 将异常包装秤类似于es返回异常数据的格式
  */
 @Data
-public class ErrorMsg {
+public class ErrorMessage {
 //    返回状态码
     private int status;
 //    错误类型
@@ -29,7 +29,7 @@ public class ErrorMsg {
         private String reason;
     }
 
-    public ErrorMsg(String type, String reason) {
+    public ErrorMessage(String type, String reason) {
         Msg msg = new Msg(type, reason);
         Msg[] msgs = new Msg[]{msg};
         Error error = new Error();
@@ -39,7 +39,7 @@ public class ErrorMsg {
         this.error = error;
     }
 
-    public ErrorMsg(int status, String type, String reason) {
+    public ErrorMessage(int status, String type, String reason) {
         this(type, reason);
         this.status = status;
     }
