@@ -17,7 +17,10 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.*;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public enum DefaultChannelPool {
@@ -34,7 +37,7 @@ public enum DefaultChannelPool {
      */
     public void offer(Channel channel, String host) {
         ConcurrentLinkedDeque<Channel> channels = channelPool.get(host);
-        if (channels == null) {
+        if (Objects.isNull(channels)) {
             channels = new ConcurrentLinkedDeque<>();
             channelPool.put(host, channels);
         }
@@ -57,21 +60,21 @@ public enum DefaultChannelPool {
         ConcurrentLinkedDeque<Channel> channels = channelPool.get(host);
         Channel channel = null;
         int i = 0;
-        if (channels != null) {
-            while (channel == null && i++ < 10) {//避免轮询整个链表，最多尝试10次，其余的channel触发idle会自动剔除
+        if (Objects.nonNull(channels)) {
+            while (Objects.isNull(channel) && i++ < 10) {//避免轮询整个链表，最多尝试10次，其余的channel触发idle会自动剔除
                 channel = channels.pollFirst();
-                if (channel == null) {
+                if (Objects.isNull(channel)) {
                     break;
                 }
                 if (!channel.isActive() || !channel.isOpen()) {// 是否是active状态，可能节点挂掉
                     channel = null;
                 }
-                if (ChannelUtil.getSessionContext(channel) != null) {// 这里防止多线程情况下channel中的SessionContext被覆盖了
+                if (Objects.nonNull(ChannelUtil.getSessionContext(channel))) {// 这里防止多线程情况下channel中的SessionContext被覆盖了
                     channel = null;
                 }
             }
         }
-        if (channel == null || !channel.isActive() || !channel.isOpen()) {
+        if (Objects.isNull(channel) || !channel.isActive() || !channel.isOpen()) {
             return new ChannelDTO(null, newChannel(ip, port));
         }
         return new ChannelDTO(channel, null);
@@ -84,7 +87,7 @@ public enum DefaultChannelPool {
      */
     public void removeChannel(Channel channel) {
         ConcurrentLinkedDeque<Channel> channels = channelPool.get(getHost(channel));
-        if (channels != null || channels.size() != 0) {
+        if (Objects.nonNull(channels) && channels.size() != 0) {
             channels.removeIf(chan -> chan.id().asLongText().equals(channel.id().asLongText()));
         }
     }
@@ -109,16 +112,7 @@ public enum DefaultChannelPool {
      */
     private Bootstrap newChannel(String ip, int port) {
         Bootstrap bootstrap = newBootstrap(ip, port);
-        bootstrap.handler(new ChannelInitializer<Channel>() {
-            @Override
-            protected void initChannel(Channel ch) {
-                Integer idle_time = PropertiesUtil.properties.getIdleTime();
-                ch.pipeline().addLast(new HttpClientCodec());
-                ch.pipeline().addLast(new IdleStateHandler(idle_time, 0, 0, TimeUnit.SECONDS));
-                ch.pipeline().addLast(new HttpObjectAggregator(1024 * 1024 * 64));
-                ch.pipeline().addLast(new HttpHandler());
-            }
-        });
+        bootstrap.handler(new Initializer());
 //        ChannelFuture channelFuture = bootstrap.connect();//不使用bootstrap.connect().sync()是为了防止同步造成性能问题
 //        return channelFuture;
         return bootstrap;//直接返回bootstrap是为了防止future已经isDone,再加上listener无效
@@ -142,6 +136,17 @@ public enum DefaultChannelPool {
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.AUTO_CLOSE, false);
         return bootstrap;
+    }
+
+    private static class Initializer extends ChannelInitializer<Channel> {
+        @Override
+        protected void initChannel(Channel ch) {
+            Integer idleTime = PropertiesUtil.properties.getIdleTime();
+            ch.pipeline().addLast(new HttpClientCodec());
+            ch.pipeline().addLast(new IdleStateHandler(idleTime, 0, 0, TimeUnit.SECONDS));
+            ch.pipeline().addLast(new HttpObjectAggregator(1024 * 1024 * 64));
+            ch.pipeline().addLast(new HttpHandler());
+        }
     }
 
     @Data

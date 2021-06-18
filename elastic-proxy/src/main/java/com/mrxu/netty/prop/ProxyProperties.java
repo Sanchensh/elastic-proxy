@@ -9,52 +9,55 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component("ProxyProperties")
 public class ProxyProperties {
-    @Value("${proxy.client.retry:3}")
+    @Value("${proxy.client.retry:'#{3}'}")
     private Integer retry;
 
-    @Value("${proxy.client.idle_time:30}")
+    @Value("${proxy.client.idle_time:'#{30}'}")
     private Integer idleTime;
 
-    @Value("${proxy.client.client_thread:0}")
+    @Value("${proxy.client.client_thread:'#{0}'}")
     private Integer clientThread;
 
-    @Value("${proxy.client.pool_size:100}")
+    @Value("${proxy.client.pool_size:'#{100}'}")
     private Integer poolSize;
 
-    @Value("${proxy.server.server_keepalive_timeout:30}")
+    @Value("${proxy.server.server_keepalive_timeout:'#{30}'}")
     private Integer serverKeepaliveTimeout;
 
-    @Value("${proxy.server.sniffer_time:10}")
+    @Value("${proxy.server.sniffer_time:'#{30}'}")
     private Integer snifferTime;
 
-    @Value("${proxy.server.boss:0}")
+    @Value("${proxy.server.sniffer:'#{false}'}")
+    private boolean sniffer;
+
+    @Value("${proxy.server.boss:'#{0}'}")
     private Integer boss;
 
-    @Value("${proxy.server.worker:0}")
+    @Value("${proxy.server.worker:'#{0}'}")
     private Integer worker;
 
-    @Value("${proxy.server.core_thread:0}")
+    @Value("${proxy.server.core_thread:'#{0}'}")
     private Integer coreThread;
 
-    @Value("${proxy.server.max_thread:0}")
+    @Value("${proxy.server.max_thread:'#{0}'}")
     private Integer maxThread;
 
-    @Value("${proxy.server.netty_port:8081}")
+    @Value("${proxy.server.netty_port:'#{8081}'}")
     private Integer nettyPort;
 
-    @Value("${proxy.server.refresh_cache:3600000}")
+    @Value("${proxy.server.refresh_cache:'#{3600000}'}")
     private Integer refreshCache;
 
-    @Value("${proxy.elasticsearch.ip:'localhost'}")
+    @Value("${proxy.elasticsearch.ip:'#{localhost}'}")
     private String ip;
 
-    @Value("${proxy.elasticsearch.port:9200}")
+    @Value("${proxy.elasticsearch.port:'#{9200}'}")
     private Integer port;
 
-    @Value("${proxy.elasticsearch.username}")
+    @Value("${proxy.elasticsearch.username:'#{elastic}'}")
     private String username;
 
-    @Value("${proxy.elasticsearch.password}")
+    @Value("${proxy.elasticsearch.password:'#{elastic}'}")
     private String password;
 
     public Integer getClientThread() {

@@ -19,17 +19,17 @@ public class Initialize {
 
     private static void initJavaFilters() {
         // 前置流程
-        DefaultFilterPipeLine.instance.addLastSegment(
+        DefaultFilterPipeLine.INSTANCE.addLastSegment(
                 new HttpProtocolCheckFilter(),
                 new AuthorizationCheckFilter(),
                 new SqlParseAndCheckFilter());
 
         // 请求es流程
-        DefaultFilterPipeLine.instance.addLastSegment(new ESRequestUriFilter(), new ESRequestFilter());
+        DefaultFilterPipeLine.INSTANCE.addLastSegment(new ESRequestUriFilter(), new ESRequestFilter());
 
         // 后置流程，只有异常时才会走这个流程，正常数据直接由请求es这一阶段返回给前端
         // 错误处理
-        DefaultFilterPipeLine.instance.addLastSegment(new ResponseHeaderFilter(), new ResponseSenderFilter(), new HandleErrorFilter());
+        DefaultFilterPipeLine.INSTANCE.addLastSegment(new ResponseHeaderFilter(), new ResponseSenderFilter(), new HandleErrorFilter());
     }
 
 }

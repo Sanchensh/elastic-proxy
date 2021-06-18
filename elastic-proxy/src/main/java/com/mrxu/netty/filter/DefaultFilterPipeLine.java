@@ -1,15 +1,12 @@
 package com.mrxu.netty.filter;
 
 
-import com.mrxu.netty.trait.Filter;
-import com.mrxu.netty.trait.FilterPipeLine;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 //单例
 public enum  DefaultFilterPipeLine implements FilterPipeLine {
-    instance;
+    INSTANCE;
     private final Map<String, AbstractFilterContext> name2ctx = new ConcurrentHashMap<>(16);
     private final List<String> index = new ArrayList<>();
     @Override
@@ -25,16 +22,6 @@ public enum  DefaultFilterPipeLine implements FilterPipeLine {
         for (int i = 0; i < index.size() - 1; i++) {
             name2ctx.get(index.get(i)).next = name2ctx.get(index.get(i + 1));
         }
-    }
-
-    @Override
-    public List<Filter> getAllFilter() {
-        Collection<AbstractFilterContext> con = name2ctx.values();
-        List<Filter> filterList = new ArrayList<>();
-        for (AbstractFilterContext context : con) {
-            filterList.add(context.getFilter());
-        }
-        return filterList;
     }
 
     @Override

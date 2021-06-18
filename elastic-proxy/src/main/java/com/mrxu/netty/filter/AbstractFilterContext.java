@@ -2,7 +2,6 @@ package com.mrxu.netty.filter;
 
 import com.mrxu.exception.CustomException;
 import com.mrxu.netty.pojo.SessionContext;
-import com.mrxu.netty.trait.Filter;
 import com.mrxu.netty.util.ByteBufManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -26,7 +25,7 @@ public abstract class AbstractFilterContext {
     }
 
     public void fireFilter(SessionContext sessionContext, String filterName) throws CustomException {
-        AbstractFilterContext filterContext = DefaultFilterPipeLine.instance.get(filterName);
+        AbstractFilterContext filterContext = DefaultFilterPipeLine.INSTANCE.get(filterName);
         if (filterContext == null) {
             ByteBufManager.close(sessionContext, new CustomException("filter error", "当前filter链路不存在"));
             return;

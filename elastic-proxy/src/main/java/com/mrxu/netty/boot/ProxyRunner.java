@@ -13,7 +13,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 public class ProxyRunner {
 	public static void run(SessionContext context) {
 		try {
-			DefaultFilterPipeLine.instance.get(HttpProtocolCheckFilter.DEFAULT_NAME).fireSelf(context); // 开始执行
+			DefaultFilterPipeLine.INSTANCE.get(HttpProtocolCheckFilter.DEFAULT_NAME).fireSelf(context); // 开始执行
 		} catch (Throwable e) {
 			errorProcess(context, e);
 		}
@@ -28,16 +28,16 @@ public class ProxyRunner {
 				if (t != null) {
 					log.error("系统内部错误，错误信息：{}", ExceptionUtils.getStackTrace(throwable));
 				}
-				DefaultFilterPipeLine.instance.get(ResponseSenderFilter.DEFAULT_NAME).fireSelf(sessionContext);
+				DefaultFilterPipeLine.INSTANCE.get(ResponseSenderFilter.DEFAULT_NAME).fireSelf(sessionContext);
 			} else { // 有错误，则将指向errorFilter进行处理
 				sessionContext.setThrowable(t);
-				DefaultFilterPipeLine.instance.get(HandleErrorFilter.DEFAULT_NAME).fireSelf(sessionContext);
+				DefaultFilterPipeLine.INSTANCE.get(HandleErrorFilter.DEFAULT_NAME).fireSelf(sessionContext);
 			}
 		} catch (Exception e) {
 			log.error("系统内部错误，错误信息：{}", ExceptionUtils.getStackTrace(e));
 			sessionContext.setHttpResponseStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 			// 直接打印错误
-			DefaultFilterPipeLine.instance.get(ResponseSenderFilter.DEFAULT_NAME).fireSelf(sessionContext);
+			DefaultFilterPipeLine.INSTANCE.get(ResponseSenderFilter.DEFAULT_NAME).fireSelf(sessionContext);
 		}
 	}
 }

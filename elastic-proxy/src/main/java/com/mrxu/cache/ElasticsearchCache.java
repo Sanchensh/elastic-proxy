@@ -10,12 +10,13 @@ import org.springframework.stereotype.Component;
 public class ElasticsearchCache {
 
     @Bean("ClusterManager")
-    public ClusterManager getClusterManager(){
+    public ClusterManager getClusterManager() {
         ClusterManager clusterManager = new ClusterManager();
         ElasticsearchNodeInfo elasticsearchNodeInfo = new ElasticsearchNodeInfo();
+        elasticsearchNodeInfo.setClusterName("elasticsearch");
         elasticsearchNodeInfo.setIp(PropertiesUtil.properties.getIp());
         elasticsearchNodeInfo.setPort(PropertiesUtil.properties.getPort());
-        elasticsearchNodeInfo.setHost(PropertiesUtil.properties.getIp() + ":"+PropertiesUtil.properties.getPort());
+        elasticsearchNodeInfo.setHost(PropertiesUtil.properties.getIp() + ":" + PropertiesUtil.properties.getPort());
         elasticsearchNodeInfo.setUsername(PropertiesUtil.properties.getUsername());
         elasticsearchNodeInfo.setPassword(PropertiesUtil.properties.getPassword());
         clusterManager.addDeadNode(elasticsearchNodeInfo);

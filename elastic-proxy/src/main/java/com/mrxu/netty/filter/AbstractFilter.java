@@ -3,15 +3,12 @@ package com.mrxu.netty.filter;
 
 import com.mrxu.exception.CustomException;
 import com.mrxu.netty.pojo.SessionContext;
-import com.mrxu.netty.trait.Filter;
 
 public abstract class AbstractFilter implements Filter {
+    public final static String PRE_FILTER_NAME = "PROXY_FILTER_";
 
-	public final static String PRE_FILTER_NAME = "PROXY_FILTER_";
-
-	@Override
-	public void run(AbstractFilterContext filterContext, SessionContext sessionContext) throws CustomException {
-		filterContext.fireNext(sessionContext);
-	}
-
+    @Override
+    public void run(AbstractFilterContext filterContext, SessionContext sessionContext) throws CustomException {
+        filterContext.fireNext(sessionContext);
+    }
 }

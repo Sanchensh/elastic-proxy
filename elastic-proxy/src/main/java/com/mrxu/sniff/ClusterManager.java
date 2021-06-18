@@ -27,40 +27,33 @@ public class ClusterManager implements AutoCloseable {
     private List<ElasticsearchNodeInfo> activeNodes = new ArrayList<>();//白名单
     private List<ElasticsearchNodeInfo> deadNodes = new ArrayList<>();//白名单
     private int index = 0;
-    private final Scheduler scheduler;
+    private Scheduler scheduler;
     private final RestTemplate restTemplate = new RestTemplate();
 
     public ClusterManager() {
-        long millis = TimeUnit.MINUTES.toMillis(PropertiesUtil.properties.getSnifferTime());
-        this.scheduler = new DefaultScheduler();
-        Task task = new Task(millis) {
-            @Override
-            public void run() {
-                super.run();
-            }
-        };
-        this.scheduler.schedule(task, millis);
-    }
-
-    /**
-     * 添加节点
-     *
-     * @param elasticsearchNodeInfos
-     */
-    public void addActiveNodes(List<ElasticsearchNodeInfo> elasticsearchNodeInfos) {
-        activeNodes.addAll(elasticsearchNodeInfos);
+        if (PropertiesUtil.properties.isSniffer()){
+            long millis = TimeUnit.SECONDS.toMillis(PropertiesUtil.properties.getSnifferTime());
+            this.scheduler = new DefaultScheduler();
+            Task task = new Task(millis) {
+                @Override
+                public void run() {
+                    super.run();
+                }
+            };
+            this.scheduler.schedule(task, millis);
+        }
     }
 
     //获取可用节点
     public ElasticsearchNodeInfo getActiveNode() {
         synchronized (this) {
-            return activeNodes.size() == 0 ? loadBalance.apply(deadNodes) : loadBalance.apply(activeNodes);
+            return CollectionUtils.isEmpty(activeNodes) ? loadBalance.apply(deadNodes) : loadBalance.apply(activeNodes);
         }
     }
 
     public void addDeadNode(ElasticsearchNodeInfo elasticsearchNodeInfo) {
-        deadNodes.add(elasticsearchNodeInfo);
         deleteFromActiveNodes(elasticsearchNodeInfo.getHost());
+        deadNodes.add(elasticsearchNodeInfo);
     }
 
     @Override
