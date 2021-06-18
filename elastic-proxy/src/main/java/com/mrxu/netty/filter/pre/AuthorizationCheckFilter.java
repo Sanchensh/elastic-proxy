@@ -3,13 +3,9 @@ package com.mrxu.netty.filter.pre;
 import com.mrxu.exception.CustomException;
 import com.mrxu.netty.filter.AbstractFilter;
 import com.mrxu.netty.filter.AbstractFilterContext;
-import com.mrxu.netty.pojo.SessionContext;
+import com.mrxu.netty.model.SessionContext;
 import com.mrxu.netty.util.ByteBufManager;
-import io.netty.handler.codec.http.FullHttpRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import java.util.Objects;
 
 @Slf4j
 /**

@@ -2,7 +2,7 @@ package com.mrxu.netty.filter;
 
 
 import com.mrxu.exception.CustomException;
-import com.mrxu.netty.pojo.SessionContext;
+import com.mrxu.netty.model.SessionContext;
 
 public abstract class AbstractFilter implements Filter {
     public final static String PRE_FILTER_NAME = "PROXY_FILTER_";

@@ -1,7 +1,7 @@
 package com.mrxu.netty.filter;
 
 import com.mrxu.exception.CustomException;
-import com.mrxu.netty.pojo.SessionContext;
+import com.mrxu.netty.model.SessionContext;
 import com.mrxu.netty.util.ByteBufManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;

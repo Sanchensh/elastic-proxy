@@ -1,7 +1,7 @@
 package com.mrxu.netty.client;
 
 import com.mrxu.exception.CustomException;
-import com.mrxu.netty.pojo.SessionContext;
+import com.mrxu.netty.model.SessionContext;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;

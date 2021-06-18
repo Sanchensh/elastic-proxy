@@ -2,7 +2,7 @@ package com.mrxu.netty.filter.rest;
 
 import com.mrxu.netty.filter.AbstractFilter;
 import com.mrxu.netty.filter.AbstractFilterContext;
-import com.mrxu.netty.pojo.SessionContext;
+import com.mrxu.netty.model.SessionContext;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

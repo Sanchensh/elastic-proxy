@@ -2,7 +2,7 @@ package com.mrxu.netty.server;
 
 import com.mrxu.exception.CustomException;
 import com.mrxu.netty.filter.ProxyRunner;
-import com.mrxu.netty.pojo.SessionContext;
+import com.mrxu.netty.model.SessionContext;
 import com.mrxu.netty.util.ByteBufManager;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;

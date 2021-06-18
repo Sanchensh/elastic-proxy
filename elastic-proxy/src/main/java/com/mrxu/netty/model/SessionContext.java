@@ -1,11 +1,11 @@
-package com.mrxu.netty.pojo;
+package com.mrxu.netty.model;
 
 import com.mrxu.exception.CustomException;
 import com.mrxu.model.ClusterNodeInfo;
 import com.mrxu.model.SearchDTO;
 import com.mrxu.netty.filter.ProxyRunner;
 import com.mrxu.netty.client.ChannelUtil;
-import com.mrxu.netty.thread.TimerHolder;
+import com.mrxu.netty.timer.TimerHolder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.DefaultChannelId;

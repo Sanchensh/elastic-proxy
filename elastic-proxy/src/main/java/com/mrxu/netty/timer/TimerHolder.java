@@ -1,5 +1,6 @@
-package com.mrxu.netty.thread;
+package com.mrxu.netty.timer;
 
+import com.mrxu.netty.thread.DefaultThreadFactory;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
 import io.netty.util.Timer;
