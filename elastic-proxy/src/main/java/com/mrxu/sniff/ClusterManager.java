@@ -3,7 +3,7 @@ package com.mrxu.sniff;
 import com.alibaba.fastjson.JSON;
 import com.jayway.jsonpath.JsonPath;
 import com.mrxu.model.ClusterNodeInfo;
-import com.mrxu.netty.prop.PropertiesUtil;
+import com.mrxu.netty.property.PropertiesUtil;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.mrxu.netty.prop;
+package com.mrxu.netty.property;
 
 
 import com.mrxu.netty.util.BeanUtils;

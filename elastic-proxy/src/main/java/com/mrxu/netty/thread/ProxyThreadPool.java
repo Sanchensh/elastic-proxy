@@ -1,6 +1,6 @@
 package com.mrxu.netty.thread;
 
-import com.mrxu.netty.prop.PropertiesUtil;
+import com.mrxu.netty.property.PropertiesUtil;
 
 import java.util.concurrent.*;
 

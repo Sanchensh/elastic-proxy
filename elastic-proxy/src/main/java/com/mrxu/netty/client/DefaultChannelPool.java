@@ -1,6 +1,6 @@
 package com.mrxu.netty.client;
 
-import com.mrxu.netty.prop.PropertiesUtil;
+import com.mrxu.netty.property.PropertiesUtil;
 import com.mrxu.netty.thread.DefaultThreadFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;

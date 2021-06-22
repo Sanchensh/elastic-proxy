@@ -1,4 +1,4 @@
-package com.mrxu.netty.filter.error;
+package com.mrxu.netty.filter.exception;
 
 import com.mrxu.exception.CustomException;
 import com.mrxu.netty.filter.AbstractFilter;

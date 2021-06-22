@@ -1,4 +1,4 @@
-package com.mrxu.netty.prop;
+package com.mrxu.netty.property;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

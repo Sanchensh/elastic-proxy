@@ -1,4 +1,4 @@
-package com.mrxu.netty.filter.rest;
+package com.mrxu.netty.filter.request;
 
 import com.alibaba.fastjson.JSONObject;
 

@@ -1,7 +1,7 @@
 package com.mrxu.cache;
 
 import com.mrxu.model.ClusterNodeInfo;
-import com.mrxu.netty.prop.PropertiesUtil;
+import com.mrxu.netty.property.PropertiesUtil;
 import com.mrxu.sniff.ClusterManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;

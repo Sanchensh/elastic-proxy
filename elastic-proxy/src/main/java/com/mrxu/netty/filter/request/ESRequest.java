@@ -1,11 +1,11 @@
-package com.mrxu.netty.filter.rest;
+package com.mrxu.netty.filter.request;
 
 import com.mrxu.exception.CustomException;
 import com.mrxu.model.ClusterNodeInfo;
 import com.mrxu.netty.client.ChannelUtil;
 import com.mrxu.netty.client.DefaultChannelPool;
 import com.mrxu.netty.model.SessionContext;
-import com.mrxu.netty.prop.PropertiesUtil;
+import com.mrxu.netty.property.PropertiesUtil;
 import com.mrxu.netty.thread.ProxyThreadPool;
 import com.mrxu.netty.util.BeanUtils;
 import com.mrxu.netty.util.ByteBufManager;

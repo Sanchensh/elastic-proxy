@@ -6,6 +6,8 @@ import com.mrxu.netty.util.ByteBufManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.util.Objects;
+
 @Slf4j
 public abstract class AbstractFilterContext {
 
@@ -13,7 +15,7 @@ public abstract class AbstractFilterContext {
     public AbstractFilterContext next;
 
     public void fireNext(SessionContext sessionContext) throws CustomException {
-        if (next == null) {
+        if (Objects.isNull(null)) {
             ByteBufManager.close(sessionContext, new CustomException("filter error", "filter链路为空"));
             return;
         }
@@ -26,7 +28,7 @@ public abstract class AbstractFilterContext {
 
     public void fireFilter(SessionContext sessionContext, String filterName) throws CustomException {
         AbstractFilterContext filterContext = DefaultFilterPipeLine.INSTANCE.get(filterName);
-        if (filterContext == null) {
+        if (Objects.isNull(filterContext)) {
             ByteBufManager.close(sessionContext, new CustomException("filter error", "当前filter链路不存在"));
             return;
         }
@@ -36,7 +38,7 @@ public abstract class AbstractFilterContext {
     private void fire0(AbstractFilterContext filterContext, SessionContext sessionContext) {
         try {
         	filterContext.getFilter().run(filterContext, sessionContext);
-        } catch (CustomException e) { ;
+        } catch (CustomException e) {
             log.error("系统内部错误，错误信息：{}", ExceptionUtils.getStackTrace(e));
             ByteBufManager.close(sessionContext, e);
         }

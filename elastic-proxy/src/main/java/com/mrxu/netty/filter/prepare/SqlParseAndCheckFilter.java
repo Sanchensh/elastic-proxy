@@ -1,4 +1,4 @@
-package com.mrxu.netty.filter.pre;
+package com.mrxu.netty.filter.prepare;
 
 import com.mrxu.exception.CustomException;
 import com.mrxu.model.SearchDTO;
