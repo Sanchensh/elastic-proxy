@@ -3,7 +3,7 @@ package com.mrxu.netty.timer;
 import com.mrxu.exception.CustomException;
 import com.mrxu.netty.client.ChannelUtil;
 import com.mrxu.netty.filter.ProxyRunner;
-import com.mrxu.netty.model.SessionContext;
+import com.mrxu.netty.SessionContext;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.Objects;

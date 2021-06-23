@@ -4,7 +4,7 @@ import com.mrxu.exception.CustomException;
 import com.mrxu.model.ClusterNodeInfo;
 import com.mrxu.netty.client.ChannelUtil;
 import com.mrxu.netty.client.DefaultChannelPool;
-import com.mrxu.netty.model.SessionContext;
+import com.mrxu.netty.SessionContext;
 import com.mrxu.netty.property.PropertiesUtil;
 import com.mrxu.netty.thread.ProxyThreadPool;
 import com.mrxu.netty.util.BeanUtils;
@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import static io.netty.buffer.Unpooled.EMPTY_BUFFER;

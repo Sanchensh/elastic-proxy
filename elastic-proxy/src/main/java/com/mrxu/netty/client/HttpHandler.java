@@ -1,7 +1,7 @@
 package com.mrxu.netty.client;
 
 import com.mrxu.exception.CustomException;
-import com.mrxu.netty.model.SessionContext;
+import com.mrxu.netty.SessionContext;
 import com.mrxu.netty.timer.TimerController;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;

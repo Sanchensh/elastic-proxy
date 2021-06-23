@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ProxyServer implements ApplicationRunner {
+public class ProxyServerStarter implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         ProxyNettyServer server = new ProxyNettyServer();

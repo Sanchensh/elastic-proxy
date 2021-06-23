@@ -1,4 +1,4 @@
-package com.mrxu.netty.model;
+package com.mrxu.netty;
 
 import com.mrxu.exception.CustomException;
 import com.mrxu.model.ClusterNodeInfo;

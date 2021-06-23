@@ -3,7 +3,7 @@ package com.mrxu.netty.filter.exception;
 import com.mrxu.exception.CustomException;
 import com.mrxu.netty.filter.AbstractFilter;
 import com.mrxu.netty.filter.AbstractFilterContext;
-import com.mrxu.netty.model.SessionContext;
+import com.mrxu.netty.SessionContext;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.extern.slf4j.Slf4j;

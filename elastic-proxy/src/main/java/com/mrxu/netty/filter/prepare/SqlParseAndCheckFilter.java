@@ -4,7 +4,7 @@ import com.mrxu.exception.CustomException;
 import com.mrxu.model.SearchDTO;
 import com.mrxu.netty.filter.AbstractFilter;
 import com.mrxu.netty.filter.AbstractFilterContext;
-import com.mrxu.netty.model.SessionContext;
+import com.mrxu.netty.SessionContext;
 import com.mrxu.netty.util.ByteBufManager;
 import com.mrxu.netty.util.IndexPatternUtil;
 import com.mrxu.sql.component.SqlParserInterface;

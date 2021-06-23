@@ -2,7 +2,7 @@ package com.mrxu.netty.util;
 
 import com.mrxu.exception.CustomException;
 import com.mrxu.netty.filter.ProxyRunner;
-import com.mrxu.netty.model.SessionContext;
+import com.mrxu.netty.SessionContext;
 import com.mrxu.netty.timer.TimerController;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
