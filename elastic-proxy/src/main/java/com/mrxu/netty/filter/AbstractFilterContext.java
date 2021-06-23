@@ -11,11 +11,10 @@ import java.util.Objects;
 @Slf4j
 public abstract class AbstractFilterContext {
 
-
     public AbstractFilterContext next;
 
     public void fireNext(SessionContext sessionContext) throws CustomException {
-        if (Objects.isNull(null)) {
+        if (Objects.isNull(next)) {
             ByteBufManager.close(sessionContext, new CustomException("filter error", "filter链路为空"));
             return;
         }

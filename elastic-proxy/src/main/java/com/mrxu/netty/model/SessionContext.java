@@ -5,6 +5,7 @@ import com.mrxu.model.ClusterNodeInfo;
 import com.mrxu.model.SearchDTO;
 import com.mrxu.netty.filter.ProxyRunner;
 import com.mrxu.netty.client.ChannelUtil;
+import com.mrxu.netty.timer.TimerController;
 import com.mrxu.netty.timer.TimerHolder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -86,37 +87,6 @@ public class SessionContext {
     public SessionContext(long timeout, Channel serverChannel) {
         this.timeout = timeout <= 0 ? 2000 : timeout;
         this.serverChannel = serverChannel;
-        this.startTimer();//该请求超时设置
-    }
-
-    private void startTimer() {
-        TimerHolder.schedule(key, () -> {
-            if (clientChannel != null) {//如果clientChannel不为空,则丢掉这个Channel，因为超时可能是该Channel导致的，如果放回池中可能还会出现类似问题
-                ChannelUtil.clearSessionContext(clientChannel);
-                clientChannel.close();
-            }
-            ProxyRunner.errorProcess(this, new CustomException(HttpResponseStatus.REQUEST_TIMEOUT.code(), "Request Timeout", "This request is timeout,please retry"));
-        }, timeout, TimeUnit.MILLISECONDS);
-    }
-
-    public void stopTimer() {
-        TimerHolder.stop(key);
-    }
-
-    //获取请求es的请求信息
-    public FullHttpRequest getRequest(ClusterNodeInfo clusterNodeInfo) {
-        DefaultFullHttpRequest request = new DefaultFullHttpRequest(HTTP_1_1,
-                HttpMethod.valueOf(restRequestMethod),
-                restRequestUri,
-                StringUtils.isNotBlank(searchDTO.getJson()) ? wrappedBuffer(searchDTO.getJson().getBytes(StandardCharsets.UTF_8)) : EMPTY_BUFFER);
-        // 构建http请求
-        request.headers().set(HttpHeaderNames.CONNECTION, "keep-alive");
-        request.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json;charset=UTF-8");
-        request.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
-        if (StringUtils.isNoneBlank(clusterNodeInfo.getAuthorization())) {
-            request.headers().set("Authorization", clusterNodeInfo.getAuthorization());
-        }
-        return request;
     }
 }
 

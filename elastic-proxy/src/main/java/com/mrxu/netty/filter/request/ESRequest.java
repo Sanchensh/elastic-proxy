@@ -13,11 +13,21 @@ import com.mrxu.sniff.ClusterManager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+
+import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
+import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * 调用es
@@ -43,7 +53,7 @@ public class ESRequest {
             ByteBufManager.close(sessionContext, new CustomException("所有es节点不可用", "所有es节点不可用，请联系管理员或重试或等待下次嗅探"));
             return;
         }
-        FullHttpRequest fullHttpRequest = sessionContext.getRequest(clusterNodeInfo);
+        FullHttpRequest fullHttpRequest = getRequest(sessionContext, clusterNodeInfo);
         //将host设置到context中，可以直接使用，避免字符串的拼接与拆解
         sessionContext.setRestRequestHost(clusterNodeInfo.getHost());
         DefaultChannelPool.ChannelDTO channelDTO = DefaultChannelPool.INSTANCE.poll(clusterNodeInfo.getIp(), clusterNodeInfo.getPort(), clusterNodeInfo.getHost());
@@ -76,5 +86,24 @@ public class ESRequest {
             callEs(sessionContext, retryCount + 1);
         else
             ByteBufManager.close(sessionContext, new CustomException("当前es节点不可用", "当前es节点不可用，请重试")); //如果retry次数达到还无法正确响应，则给客户端返回错误信息
+    }
+
+
+    private static FullHttpRequest getRequest(SessionContext sessionContext, ClusterNodeInfo clusterNodeInfo) {
+        DefaultFullHttpRequest request = new DefaultFullHttpRequest(HTTP_1_1,
+                HttpMethod.valueOf(sessionContext.getRestRequestMethod()),
+                sessionContext.getRestRequestUri(),
+                StringUtils.isNotBlank(sessionContext.getSearchDTO().getJson()) ? wrappedBuffer(sessionContext.
+                                getSearchDTO().
+                                getJson().
+                                getBytes(UTF_8)) : EMPTY_BUFFER);
+        // 构建http请求
+        request.headers().set(HttpHeaderNames.CONNECTION, "keep-alive");
+        request.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json;charset=UTF-8");
+        request.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
+        if (StringUtils.isNoneBlank(clusterNodeInfo.getAuthorization())) {
+            request.headers().set("Authorization", clusterNodeInfo.getAuthorization());
+        }
+        return request;
     }
 }

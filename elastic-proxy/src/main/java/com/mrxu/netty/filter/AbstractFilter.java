@@ -1,6 +1,5 @@
 package com.mrxu.netty.filter;
 
-
 import com.mrxu.exception.CustomException;
 import com.mrxu.netty.model.SessionContext;
 

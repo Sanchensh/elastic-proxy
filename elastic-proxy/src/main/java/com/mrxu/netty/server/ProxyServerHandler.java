@@ -3,6 +3,7 @@ package com.mrxu.netty.server;
 import com.mrxu.exception.CustomException;
 import com.mrxu.netty.filter.ProxyRunner;
 import com.mrxu.netty.model.SessionContext;
+import com.mrxu.netty.timer.TimerController;
 import com.mrxu.netty.util.ByteBufManager;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
@@ -28,12 +29,13 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
         try {
             FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
             String timeout = fullHttpRequest.headers().get("timeout");
-            SessionContext context = StringUtils.isNotBlank(timeout) ? new SessionContext(Long.parseLong(timeout), ctx.channel()) : new SessionContext(ctx.channel());
+            SessionContext sessionContext = StringUtils.isNotBlank(timeout) ? new SessionContext(Long.parseLong(timeout), ctx.channel()) : new SessionContext(ctx.channel());
+            TimerController.startTimer(sessionContext);//该请求超时设置
             if (is100ContinueExpected(fullHttpRequest)) { //HTTP 100 Continue 信息型状态响应码表示目前为止一切正常, 客户端应该继续请求, 如果已完成请求则忽略.
                 ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
             }
-            context.setFullHttpRequest(fullHttpRequest);
-            ProxyRunner.run(context);
+            sessionContext.setFullHttpRequest(fullHttpRequest);
+            ProxyRunner.run(sessionContext);
         } finally {
             ByteBufManager.deepSafeRelease(msg);//释放请求数据，避免堆外内存泄露
         }

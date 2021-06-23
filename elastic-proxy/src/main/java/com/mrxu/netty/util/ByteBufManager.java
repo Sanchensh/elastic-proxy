@@ -3,6 +3,7 @@ package com.mrxu.netty.util;
 import com.mrxu.exception.CustomException;
 import com.mrxu.netty.filter.ProxyRunner;
 import com.mrxu.netty.model.SessionContext;
+import com.mrxu.netty.timer.TimerController;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +20,7 @@ public class ByteBufManager {
      * @param customException
      */
     public static void close(SessionContext sessionContext, CustomException customException) {
-        sessionContext.stopTimer();//关闭超时
+        TimerController.stopTimer(sessionContext);//关闭超时
         ProxyRunner.errorProcess(sessionContext, customException);
         sessionContext.getServerChannel().close(); // 如果在解析的时候失败，则直接关闭掉该channel。
     }
