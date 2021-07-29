@@ -7,15 +7,17 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.mrxu.common.Constants.SNIFFER_THREAD_NAME;
+
 public class DefaultScheduler implements Scheduler {
-    private static final String sniffer_thread_name = "es_rest_client_sniffer"; //线程池名称
+
     final ScheduledExecutorService executor;
     public DefaultScheduler() {
         this.executor = initScheduledExecutorService();
     }
 
     private static ScheduledExecutorService initScheduledExecutorService() {
-        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.create(sniffer_thread_name,true));
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.create(SNIFFER_THREAD_NAME,true));
         executor.setRemoveOnCancelPolicy(true);
         return executor;
     }

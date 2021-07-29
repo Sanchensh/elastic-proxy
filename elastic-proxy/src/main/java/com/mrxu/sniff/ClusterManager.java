@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ClusterManager implements AutoCloseable {
     private List<ClusterNodeInfo> activeNodes = new ArrayList<>();//白名单
-    private List<ClusterNodeInfo> deadNodes = new ArrayList<>();//白名单
+    private List<ClusterNodeInfo> deadNodes = new ArrayList<>();//黑名单
     private int index = 0;
     private Scheduler scheduler;
     private final RestTemplate restTemplate = new RestTemplate();
@@ -67,15 +67,7 @@ public class ClusterManager implements AutoCloseable {
     }
 
     //节点轮询策略
-    private Function<List<ClusterNodeInfo>, ClusterNodeInfo> loadBalance = (infoList) -> {
-        int size = infoList.size();
-        if (index >= size) {
-            index = 0;
-            return infoList.get(0);
-        } else {
-            return infoList.get(index++);
-        }
-    };
+    private Function<List<ClusterNodeInfo>, ClusterNodeInfo> loadBalance = infoList -> index >= infoList.size() ? infoList.get(index = 0) : infoList.get(index++);
 
     private void sniffNodes() {
         ClusterNodeInfo clusterNodeInfo = getActiveNode();
@@ -121,7 +113,9 @@ public class ClusterManager implements AutoCloseable {
                                         .build();
                                 return elasticSearch;
                             }).collect(Collectors.toList());
-                    deadNodes.clear();
+                    if (!activeNodes.isEmpty()){
+                        deadNodes.clear();
+                    }
                 }
                 log.info("集群名：{}，嗅探结果：{}", clusterNodeInfo.getClusterName(), JSON.toJSONString(activeNodes.stream().map(ClusterNodeInfo::getHost).collect(Collectors.toList())));
             }

@@ -1,5 +1,6 @@
 package com.mrxu.netty.client;
 
+import com.mrxu.common.Constants;
 import com.mrxu.netty.property.PropertiesUtil;
 import com.mrxu.netty.thread.DefaultThreadFactory;
 import io.netty.bootstrap.Bootstrap;
@@ -22,6 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
+import static com.mrxu.common.Constants.*;
+
 @Slf4j
 public enum DefaultChannelPool {
     //单例
@@ -29,7 +32,7 @@ public enum DefaultChannelPool {
     //Channel池，key是host，value是该节点所有Channel集合
     private ConcurrentHashMap<String, ConcurrentLinkedDeque<Channel>> channelPool = new ConcurrentHashMap<>();
     //请求es的NioEventLoopGroup是共用的，如果每个节点都重新创建，可能服务器会出现 Too many open files 错误
-    private NioEventLoopGroup nioEventLoopGroup = new NioEventLoopGroup(PropertiesUtil.properties.getClientThread(), DefaultThreadFactory.create("client_nio_event_loop_group", true));
+    private NioEventLoopGroup nioEventLoopGroup = new NioEventLoopGroup(PropertiesUtil.properties.getClientThread(), DefaultThreadFactory.create(CLIENT_EVENT_LOOP_NAME, true));
 
     /**
      * @param channel 使用过的Channel
@@ -100,7 +103,7 @@ public enum DefaultChannelPool {
      */
     private String getHost(Channel channel) {
         InetSocketAddress inetSocketAddress = (InetSocketAddress) channel.remoteAddress();
-        return inetSocketAddress.getHostString() + ":" + inetSocketAddress.getPort();
+        return inetSocketAddress.getHostString() + COLON + inetSocketAddress.getPort();
     }
 
     /**
@@ -132,7 +135,7 @@ public enum DefaultChannelPool {
                 .group(nioEventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIMEOUT_MILLIS)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.AUTO_CLOSE, false);
         return bootstrap;
@@ -144,7 +147,7 @@ public enum DefaultChannelPool {
             Integer idleTime = PropertiesUtil.properties.getIdleTime();
             ch.pipeline().addLast(new HttpClientCodec());
             ch.pipeline().addLast(new IdleStateHandler(idleTime, 0, 0, TimeUnit.SECONDS));
-            ch.pipeline().addLast(new HttpObjectAggregator(1024 * 1024 * 64));
+            ch.pipeline().addLast(new HttpObjectAggregator(CLIENT_MAX_CONTENT_LENGTH));
             ch.pipeline().addLast(new HttpHandler());
         }
     }

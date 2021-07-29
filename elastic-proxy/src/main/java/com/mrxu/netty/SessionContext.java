@@ -1,25 +1,13 @@
 package com.mrxu.netty;
 
-import com.mrxu.exception.CustomException;
-import com.mrxu.model.ClusterNodeInfo;
 import com.mrxu.model.SearchDTO;
-import com.mrxu.netty.filter.ProxyRunner;
-import com.mrxu.netty.client.ChannelUtil;
-import com.mrxu.netty.timer.TimerController;
-import com.mrxu.netty.timer.TimerHolder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.DefaultChannelId;
 import io.netty.handler.codec.http.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
-
-import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
-import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 @Data
@@ -42,10 +30,10 @@ public class SessionContext {
     private Throwable throwable;
 
     //是否打印堆栈信息
-    private Boolean printStackInfo;
+    private boolean printStackInfo;
 
     //集群id
-    private Integer clusterId;
+    private int clusterId;
 
     //请求的indexPattern
     private String indexPattern;
@@ -69,7 +57,7 @@ public class SessionContext {
     private String restRequestUri;
 
     //请求es的Method
-    private String restRequestMethod;
+    private HttpMethod restRequestMethod;
 
     //消息是否发送过错误消息，避免重复发送
     private boolean bodySend;

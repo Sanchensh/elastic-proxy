@@ -51,7 +51,7 @@ public class HandleErrorFilter extends AbstractFilter {
 			sessionContext.setErrorResponseBody(Unpooled.directBuffer().writeBytes(t.getMessage() != null ? t.getMessage().getBytes() : "null".getBytes()));
 		}
 
-		if (sessionContext.getPrintStackInfo()){
+		if (sessionContext.isPrintStackInfo()){
 			sessionContext.getThrowable().printStackTrace();
 		}
 	}

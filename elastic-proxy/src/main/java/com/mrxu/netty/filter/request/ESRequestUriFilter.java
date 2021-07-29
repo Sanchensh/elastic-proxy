@@ -10,6 +10,7 @@ import com.mrxu.netty.SessionContext;
 import com.mrxu.netty.util.ByteBufManager;
 import com.mrxu.netty.util.Uri;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import java.util.Objects;
@@ -28,30 +29,30 @@ public class ESRequestUriFilter extends AbstractFilter {
         SearchDTO commonDTO = sessionContext.getSearchDTO();
         String index = commonDTO.getIndex();
         String uri;
-        String method;
+        HttpMethod method;
         switch (fullHttpRequest.uri()) {
             case Uri.search:
                 uri = index + Uri.es_search;
-                method = "POST";
+                method = HttpMethod.POST;
                 break;
             case Uri.insert:
                 uri = getEndPoint(sessionContext);
-                method = "POST";
+                method = HttpMethod.POST;
                 break;
             case Uri.updateById:
                 uri = getEndpoint(sessionContext, Uri.es_update);
-                method = "POST";
+                method = HttpMethod.POST;
                 break;
             case Uri.updateByQuery:
-                method = "POST";
+                method = HttpMethod.POST;
                 uri = index + Uri.es_update_by_query;
                 break;
             case Uri.delete:
-                method = "POST";
+                method = HttpMethod.POST;
                 uri = index + Uri.es_delete;
                 break;
             case Uri.searchScroll:
-                method = "POST";
+                method = HttpMethod.POST;
                 //scroll id 不是空则是滚动查询
                 if (!StringUtils.isBlank(commonDTO.getScrollId())) {
                     Scroll scroll = new Scroll(commonDTO.getKeepAlive(), commonDTO.getScrollId());

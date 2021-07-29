@@ -11,17 +11,15 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.mrxu.common.Constants.APPLICATION_NAME;
+import static com.mrxu.common.Constants.DEFAULT_TICK_DURATION;
+
 @Slf4j
 public class TimerHolder {
-
-    private final static long defaultTickDuration = 1;
-
     private final static ConcurrentMap<String, Timeout> scheduledFutures = PlatformDependent.newConcurrentHashMap();
 
     private static class DefaultInstance {
-        static final Timer INSTANCE = new HashedWheelTimer(DefaultThreadFactory.create(
-                "Timer" + defaultTickDuration, true),
-                defaultTickDuration, TimeUnit.MILLISECONDS);
+        static final Timer INSTANCE = new HashedWheelTimer(DefaultThreadFactory.create(APPLICATION_NAME , true), DEFAULT_TICK_DURATION, TimeUnit.MILLISECONDS);
     }
 
     private TimerHolder() {
@@ -29,7 +27,7 @@ public class TimerHolder {
 
     /**
      * Get a singleton instance of {@link Timer}. <br>
-     * The tick duration is {@link #defaultTickDuration}.
+     * The tick duration is DEFAULT_TICK_DURATION
      *
      * @return Timer
      */

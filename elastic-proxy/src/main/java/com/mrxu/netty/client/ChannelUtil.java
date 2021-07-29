@@ -18,26 +18,28 @@ import io.netty.channel.Channel;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
+import static com.mrxu.common.Constants.SESSION_ATTRIBUTE;
+
 /**
  * Channel工具类
  */
 public class ChannelUtil {
 
-    public static final AttributeKey<SessionContext> SESSION_ATTRIBUTE = AttributeKey.valueOf("session_attribute");
+    public static final AttributeKey<SessionContext> attributeKey = AttributeKey.valueOf(SESSION_ATTRIBUTE);
 
     //获取SessionContext
     public static SessionContext getSessionContext(Channel channel) {
-        return channel.attr(SESSION_ATTRIBUTE).get();
+        return channel.attr(attributeKey).get();
     }
 
     //设置ChannelAttribute属性
     public static void attributeSessionContext(Channel channel, SessionContext sessionContext) {
-        Attribute<SessionContext> attr = channel.attr(SESSION_ATTRIBUTE);
+        Attribute<SessionContext> attr = channel.attr(attributeKey);
         attr.set(sessionContext);
     }
 
     //清除SessionContext
     public static void clearSessionContext(Channel channel) {
-        channel.attr(SESSION_ATTRIBUTE).set(null);
+        channel.attr(attributeKey).set(null);
     }
 }

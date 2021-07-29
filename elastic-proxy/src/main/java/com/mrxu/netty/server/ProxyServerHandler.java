@@ -15,6 +15,8 @@ import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import static com.mrxu.common.Constants.TIMEOUT;
 import static io.netty.channel.ChannelFutureListener.CLOSE;
 import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
@@ -28,7 +30,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         try {
             FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
-            String timeout = fullHttpRequest.headers().get("timeout");
+            String timeout = fullHttpRequest.headers().get(TIMEOUT);
             SessionContext sessionContext = StringUtils.isNotBlank(timeout) ? new SessionContext(Long.parseLong(timeout), ctx.channel()) : new SessionContext(ctx.channel());
             TimerController.startTimer(sessionContext);//该请求超时设置
             if (is100ContinueExpected(fullHttpRequest)) { //HTTP 100 Continue 信息型状态响应码表示目前为止一切正常, 客户端应该继续请求, 如果已完成请求则忽略.

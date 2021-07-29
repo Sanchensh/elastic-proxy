@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.mrxu.common.Constants.*;
+
 @Slf4j
 public class ProxyNettyServer {
 
@@ -33,7 +35,7 @@ public class ProxyNettyServer {
                 .option(ChannelOption.SO_KEEPALIVE, Boolean.TRUE)
                 .option(NioChannelOption.SO_KEEPALIVE, Boolean.TRUE)
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIMEOUT_MILLIS)
                 .childOption(ChannelOption.SO_KEEPALIVE, Boolean.TRUE)
                 .childOption(NioChannelOption.SO_KEEPALIVE, Boolean.TRUE)
                 .childOption(ChannelOption.TCP_NODELAY, Boolean.TRUE)
@@ -41,7 +43,6 @@ public class ProxyNettyServer {
                 .childHandler(new Initializer());
         try {
             ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
-            System.out.println("Proxy server started,port is : " + port);
             log.info("Proxy server started,port is : {}", port);
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e){
@@ -57,11 +58,11 @@ public class ProxyNettyServer {
         @Override
         public void initChannel(Channel ch) throws Exception {
             ChannelPipeline pipeline = ch.pipeline();
-            pipeline.addLast(new IdleStateHandler(PropertiesUtil.properties.getServerKeepaliveTimeout(), 0, 0, TimeUnit.SECONDS));
+            pipeline.addLast(new IdleStateHandler(PropertiesUtil.properties.getServerKeepaliveTimeout(), ZERO, ZERO, TimeUnit.SECONDS));
             pipeline.addLast(new HttpResponseEncoder());
-            pipeline.addLast(new HttpRequestDecoder(4096, 8192, 8192, Boolean.TRUE));
+            pipeline.addLast(new HttpRequestDecoder(ALL_MAX_SIZE, ALL_MAX_SIZE, ALL_MAX_SIZE, Boolean.TRUE));
             pipeline.addLast(new HttpServerKeepAliveHandler());
-            pipeline.addLast(new HttpObjectAggregator(1024 * 1024 * 64));
+            pipeline.addLast(new HttpObjectAggregator(SERVER_MAX_CONTENT_LENGTH));
             pipeline.addLast(new ProxyServerHandler());
         }
     }
