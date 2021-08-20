@@ -31,9 +31,9 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
-public final class ESRequestFilter extends AbstractFilter {
+public final class ESRequestCallFilter extends AbstractFilter {
 
-    public static String DEFAULT_NAME = PRE_FILTER_NAME + ESRequestFilter.class.getSimpleName().toUpperCase();
+    public static String DEFAULT_NAME = PRE_FILTER_NAME + ESRequestCallFilter.class.getSimpleName().toUpperCase();
 
     @Override
     public String name() {

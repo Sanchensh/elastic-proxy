@@ -7,7 +7,7 @@ import com.mrxu.netty.filter.exception.ResponseSenderFilter;
 import com.mrxu.netty.filter.prepare.AuthorizationCheckFilter;
 import com.mrxu.netty.filter.prepare.HttpProtocolCheckFilter;
 import com.mrxu.netty.filter.prepare.SqlParseAndCheckFilter;
-import com.mrxu.netty.filter.request.ESRequestFilter;
+import com.mrxu.netty.filter.request.ESRequestCallFilter;
 import com.mrxu.netty.filter.request.ESRequestUriFilter;
 import com.mrxu.netty.property.PropertiesUtil;
 import com.mrxu.netty.server.ProxyNettyServer;
@@ -37,7 +37,7 @@ public class ProxyServerStarter implements ApplicationRunner {
                 new SqlParseAndCheckFilter());
 
         // 请求es流程
-        DefaultFilterPipeLine.INSTANCE.addLastSegment(new ESRequestUriFilter(), new ESRequestFilter());
+        DefaultFilterPipeLine.INSTANCE.addLastSegment(new ESRequestUriFilter(), new ESRequestCallFilter());
 
         // 后置流程，只有异常时才会走这个流程，正常数据直接由请求es这一阶段返回给前端
         // 错误处理

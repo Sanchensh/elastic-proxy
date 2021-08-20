@@ -5,14 +5,15 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 //单例
-public enum  DefaultFilterPipeLine implements FilterPipeLine {
+public enum DefaultFilterPipeLine implements FilterPipeLine {
     INSTANCE;
     private final Map<String, AbstractFilterContext> name2ctx = new ConcurrentHashMap<>(16);
     private final List<String> index = new ArrayList<>();
+
     @Override
     public void addLastSegment(Filter... filters) {
         for (Filter filter : filters) {
-			checkDuplicateName(filter.name());
+            checkDuplicateName(filter.name());
             index.add(filter.name());
             name2ctx.put(filter.name(), new FilterContext(filter));
         }
