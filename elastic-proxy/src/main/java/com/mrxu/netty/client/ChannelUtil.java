@@ -18,6 +18,8 @@ import io.netty.channel.Channel;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
+import java.util.Objects;
+
 import static com.mrxu.common.Constants.SESSION_ATTRIBUTE;
 
 /**
@@ -40,6 +42,7 @@ public class ChannelUtil {
 
     //清除SessionContext
     public static void clearSessionContext(Channel channel) {
-        channel.attr(attributeKey).set(null);
+        if (Objects.nonNull(channel))
+            channel.attr(attributeKey).set(null);
     }
 }

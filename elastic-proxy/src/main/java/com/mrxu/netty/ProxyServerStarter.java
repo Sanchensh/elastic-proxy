@@ -1,9 +1,9 @@
 package com.mrxu.netty;
 
 import com.mrxu.netty.filter.DefaultFilterPipeLine;
-import com.mrxu.netty.filter.exception.HandleErrorFilter;
-import com.mrxu.netty.filter.exception.ResponseHeaderFilter;
-import com.mrxu.netty.filter.exception.ResponseSenderFilter;
+import com.mrxu.netty.filter.exception.ErrorMessageLogFilter;
+import com.mrxu.netty.filter.exception.ErrorResponseHeaderFilter;
+import com.mrxu.netty.filter.exception.ErrorResponseSenderFilter;
 import com.mrxu.netty.filter.prepare.AuthorizationCheckFilter;
 import com.mrxu.netty.filter.prepare.HttpProtocolCheckFilter;
 import com.mrxu.netty.filter.prepare.SqlParseAndCheckFilter;
@@ -41,6 +41,6 @@ public class ProxyServerStarter implements ApplicationRunner {
 
         // 后置流程，只有异常时才会走这个流程，正常数据直接由请求es这一阶段返回给前端
         // 错误处理
-        DefaultFilterPipeLine.INSTANCE.addLastSegment(new ResponseHeaderFilter(), new ResponseSenderFilter(), new HandleErrorFilter());
+        DefaultFilterPipeLine.INSTANCE.addLastSegment(new ErrorResponseHeaderFilter(), new ErrorResponseSenderFilter(), new ErrorMessageLogFilter());
     }
 }

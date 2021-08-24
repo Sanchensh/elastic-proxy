@@ -1,7 +1,7 @@
 package com.mrxu.netty.filter;
 
-import com.mrxu.netty.filter.exception.HandleErrorFilter;
-import com.mrxu.netty.filter.exception.ResponseSenderFilter;
+import com.mrxu.netty.filter.exception.ErrorMessageLogFilter;
+import com.mrxu.netty.filter.exception.ErrorResponseSenderFilter;
 import com.mrxu.netty.filter.prepare.HttpProtocolCheckFilter;
 import com.mrxu.netty.SessionContext;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -27,16 +27,16 @@ public class ProxyRunner {
 				if (t != null) {
 					log.error("系统内部错误，错误信息：{}", ExceptionUtils.getStackTrace(throwable));
 				}
-				DefaultFilterPipeLine.INSTANCE.get(ResponseSenderFilter.DEFAULT_NAME).fireSelf(sessionContext);
+				DefaultFilterPipeLine.INSTANCE.get(ErrorResponseSenderFilter.DEFAULT_NAME).fireSelf(sessionContext);
 			} else { // 有错误，则将指向errorFilter进行处理
 				sessionContext.setThrowable(t);
-				DefaultFilterPipeLine.INSTANCE.get(HandleErrorFilter.DEFAULT_NAME).fireSelf(sessionContext);
+				DefaultFilterPipeLine.INSTANCE.get(ErrorMessageLogFilter.DEFAULT_NAME).fireSelf(sessionContext);
 			}
 		} catch (Exception e) {
 			log.error("系统内部错误，错误信息：{}", ExceptionUtils.getStackTrace(e));
 			sessionContext.setHttpResponseStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 			// 直接打印错误
-			DefaultFilterPipeLine.INSTANCE.get(ResponseSenderFilter.DEFAULT_NAME).fireSelf(sessionContext);
+			DefaultFilterPipeLine.INSTANCE.get(ErrorResponseSenderFilter.DEFAULT_NAME).fireSelf(sessionContext);
 		}
 	}
 }

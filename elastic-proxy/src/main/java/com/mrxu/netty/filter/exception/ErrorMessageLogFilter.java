@@ -14,8 +14,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  *
  */
 @Slf4j
-public class HandleErrorFilter extends AbstractFilter {
-	public static String DEFAULT_NAME = PRE_FILTER_NAME + HandleErrorFilter.class.getSimpleName().toUpperCase();
+public class ErrorMessageLogFilter extends AbstractFilter {
+	public static String DEFAULT_NAME = PRE_FILTER_NAME + ErrorMessageLogFilter.class.getSimpleName().toUpperCase();
 
 	@Override
 	public String name() {
@@ -33,22 +33,22 @@ public class HandleErrorFilter extends AbstractFilter {
 			// 错误信息渲染，设置到body里面。返回状态码和mercury状态码处理
 			processThrowable(sessionContext, throwable);
 		}
-		filterContext.fireFilter(sessionContext, ResponseHeaderFilter.DEFAULT_NAME);
+		filterContext.fireFilter(sessionContext, ErrorResponseHeaderFilter.DEFAULT_NAME);
 	}
 
-	public static void processThrowable(SessionContext sessionContext, Throwable t) {
+	public static void processThrowable(SessionContext sessionContext, Throwable throwable) {
 		if (sessionContext.getHttpResponseStatus() == HttpResponseStatus.REQUEST_TIMEOUT) {
 			return;
 		}
 
-		if (t instanceof CustomException) {
-			sessionContext.setHttpResponseStatus(HttpResponseStatus.valueOf(((CustomException) t).getStatus()));
+		if (throwable instanceof CustomException) {
+			sessionContext.setHttpResponseStatus(HttpResponseStatus.valueOf(((CustomException) throwable).getStatus()));
 		} else {
 			sessionContext.setHttpResponseStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		if (sessionContext.getErrorResponseBody() == null){
-			sessionContext.setErrorResponseBody(Unpooled.directBuffer().writeBytes(t.getMessage() != null ? t.getMessage().getBytes() : "null".getBytes()));
+			sessionContext.setErrorResponseBody(Unpooled.directBuffer().writeBytes(throwable.getMessage() != null ? throwable.getMessage().getBytes() : "null".getBytes()));
 		}
 
 		if (sessionContext.isPrintStackInfo()){
@@ -64,8 +64,8 @@ public class HandleErrorFilter extends AbstractFilter {
 	}
 
 	//判断是否需要打印堆栈信息
-	private static Boolean printExceptionStackInfo(Throwable t) {
-		return !(t instanceof CustomException);
+	private static Boolean printExceptionStackInfo(Throwable throwable) {
+		return !(throwable instanceof CustomException);
 	}
 
 }

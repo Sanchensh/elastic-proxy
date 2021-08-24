@@ -22,6 +22,5 @@ public class ByteBufManager {
     public static void close(SessionContext sessionContext, CustomException customException) {
         TimerController.stopTimer(sessionContext);//关闭超时
         ProxyRunner.errorProcess(sessionContext, customException);
-        sessionContext.getServerChannel().close(); // 如果在解析的时候失败，则直接关闭掉该channel。
     }
 }

@@ -42,7 +42,7 @@ public class SessionContext {
     private HttpResponseStatus httpResponseStatus = HttpResponseStatus.OK;
 
     //返回给客户端的头信息
-    private HttpHeaders responseHttpHeaders = new DefaultHttpHeaders(false);
+    private HttpHeaders responseHttpHeaders;
 
     //客户端请求数据
     private FullHttpRequest fullHttpRequest;
@@ -67,6 +67,10 @@ public class SessionContext {
 
     // 返回的httpVersion
     private HttpVersion responseHttpVersion = HTTP_1_1;
+
+    public SessionContext(){
+
+    }
 
     public SessionContext(Channel serverChannel) {
         this(2000, serverChannel);

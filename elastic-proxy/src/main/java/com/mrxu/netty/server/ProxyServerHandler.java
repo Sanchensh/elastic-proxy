@@ -1,6 +1,7 @@
 package com.mrxu.netty.server;
 
 import com.mrxu.exception.CustomException;
+import com.mrxu.netty.SessionContextManager;
 import com.mrxu.netty.filter.ProxyRunner;
 import com.mrxu.netty.SessionContext;
 import com.mrxu.netty.timer.TimerController;
@@ -31,7 +32,9 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
         try {
             FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
             String timeout = fullHttpRequest.headers().get(TIMEOUT);
-            SessionContext sessionContext = StringUtils.isNotBlank(timeout) ? new SessionContext(Long.parseLong(timeout), ctx.channel()) : new SessionContext(ctx.channel());
+            SessionContext sessionContext = StringUtils.isNotBlank(timeout)
+                    ? SessionContextManager.SINGLETON.getSessionContext(Long.parseLong(timeout), ctx.channel())
+                    : SessionContextManager.SINGLETON.getSessionContext(ctx.channel());
             TimerController.startTimer(sessionContext);//该请求超时设置
             if (is100ContinueExpected(fullHttpRequest)) { //HTTP 100 Continue 信息型状态响应码表示目前为止一切正常, 客户端应该继续请求, 如果已完成请求则忽略.
                 ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
@@ -60,6 +63,6 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
             super.userEventTriggered(ctx, evt);
             return;
         }
-        ctx.channel().close();
+        ctx.channel().closeFuture();
     }
 }
